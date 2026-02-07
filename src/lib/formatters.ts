@@ -66,7 +66,7 @@ export function buildInvoiceSummary(invoice: Invoice): string {
     "",
     ...invoice.lineItems.map(
       (item) =>
-        `${item.description} — ${item.quantity} × ${formatCurrency(item.rate)} = ${formatCurrency(item.lineTotal)}`
+        `${item.description} - ${item.quantity} x ${formatCurrency(item.rate)} = ${formatCurrency(item.lineTotal)}`
     ),
     "",
     `Subtotal: ${formatCurrency(invoice.subtotal)}`,

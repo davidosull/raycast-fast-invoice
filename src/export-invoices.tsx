@@ -94,7 +94,7 @@ export default function ExportInvoices() {
 
       await showToast({ style: Toast.Style.Success, title: "Export complete" });
 
-      // Show success with actions — open the file
+      // Open the exported file
       await open(filePath);
     } catch (error) {
       await showToast({

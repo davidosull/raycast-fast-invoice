@@ -49,23 +49,23 @@ export async function generateInvoicePDF(
 
     let y = M;
 
-    // ── INVOICE title + number (top right) ──
+    // Invoice title + number (top right)
     doc.font("Helvetica-Bold").fontSize(9).fillColor(BLACK);
     doc.text("INVOICE", M, y, { width: CW, align: "right" });
     y += 14;
     doc.font("Helvetica").fontSize(9).fillColor(MID_GREY);
     doc.text(invoice.invoiceNumber, M, y, { width: CW, align: "right" });
 
-    // ── Business name (top left, same baseline as INVOICE) ──
+    // Business name (top left, same baseline as INVOICE)
     doc.font("Helvetica-Bold").fontSize(9).fillColor(BLACK).text(preferences.businessName, M, M);
 
     y += 24;
 
-    // ── Divider ──
+    // Divider
     doc.moveTo(M, y).lineTo(TABLE_RIGHT, y).lineWidth(0.5).strokeColor(LIGHT_GREY).stroke();
     y += 20;
 
-    // ── Two-column: From / To ──
+    // Two-column: From / To
     const colLeft = M;
     const colRight = M + CW / 2 + 20;
 
@@ -110,7 +110,7 @@ export async function generateInvoicePDF(
 
     y = Math.max(y, ry) + 8;
 
-    // ── Date / Due row ──
+    // Date / Due row
     doc.font("Helvetica").fontSize(7).fillColor(MID_GREY).text("Date", colLeft, y);
     doc.text("Due", colRight, y);
     y += 12;
@@ -118,11 +118,11 @@ export async function generateInvoicePDF(
     doc.text(formatDate(invoice.dueDate), colRight, y);
     y += 20;
 
-    // ── Divider ──
+    // Divider
     doc.moveTo(M, y).lineTo(TABLE_RIGHT, y).lineWidth(0.5).strokeColor(LIGHT_GREY).stroke();
     y += 16;
 
-    // ── Line items table header ──
+    // Line items table header
     doc.font("Helvetica").fontSize(7).fillColor(MID_GREY);
     doc.text("Description", COL_DESC_X, y, { width: COL_DESC_W });
     doc.text("Qty", COL_QTY_X, y, { width: COL_QTY_W, align: "right" });
@@ -132,7 +132,7 @@ export async function generateInvoicePDF(
     doc.moveTo(M, y).lineTo(TABLE_RIGHT, y).lineWidth(0.5).strokeColor(LIGHT_GREY).stroke();
     y += 2;
 
-    // ── Table rows ──
+    // Table rows
     doc.font("Helvetica").fontSize(8.5).fillColor(BLACK);
     for (const item of invoice.lineItems) {
       const descH = doc.heightOfString(item.description, { width: COL_DESC_W });
@@ -155,7 +155,7 @@ export async function generateInvoicePDF(
       y += 2;
     }
 
-    // ── Totals ──
+    // Totals
     y += 10;
     doc.font("Helvetica").fontSize(8.5).fillColor(BLACK);
     doc.text("Subtotal", COL_RATE_X, y, { width: COL_RATE_W, align: "right" });
@@ -185,7 +185,7 @@ export async function generateInvoicePDF(
       y += 14;
     }
 
-    // ── Payment details ──
+    // Payment details
     y += 24;
     y = checkPageBreak(doc, y, 60);
     doc.font("Helvetica").fontSize(7).fillColor(MID_GREY).text("Payment Details", M, y);
@@ -202,7 +202,7 @@ export async function generateInvoicePDF(
     doc.font("Helvetica").fontSize(8).fillColor(MID_GREY).text(terms, M, y, { width: CW });
     y += 12;
 
-    // ── Notes ──
+    // Notes
     if (invoice.notes) {
       y += 14;
       y = checkPageBreak(doc, y, 40);
@@ -211,7 +211,7 @@ export async function generateInvoicePDF(
       doc.font("Helvetica").fontSize(8.5).fillColor(BLACK).text(invoice.notes, M, y, { width: CW });
     }
 
-    // ── Footer ──
+    // Footer
     const footerY = PDF.HEIGHT - M - 10;
     doc.font("Helvetica").fontSize(7).fillColor(MID_GREY).text(preferences.businessName, M, footerY, {
       width: CW,

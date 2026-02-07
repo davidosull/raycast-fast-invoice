@@ -5,3 +5,5 @@ data/
 *.tsbuildinfo
 preview-invoice.pdf
 preview-pdf.ts
+CLAUDE.md
+raycast-invoice-generator-scope.md

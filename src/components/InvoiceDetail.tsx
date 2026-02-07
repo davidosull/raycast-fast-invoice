@@ -17,7 +17,7 @@ export default function InvoiceDetail({ invoice }: InvoiceDetailProps) {
     )
     .join("\n");
 
-  const md = `# ${invoice.invoiceNumber} — ${invoice.clientName}
+  const md = `# ${invoice.invoiceNumber} - ${invoice.clientName}
 
 **Status:** ${STATUS_LABELS[invoice.status]}
 **Date:** ${formatDate(invoice.invoiceDate)}

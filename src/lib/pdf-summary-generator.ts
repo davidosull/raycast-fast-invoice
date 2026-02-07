@@ -33,9 +33,9 @@ export async function generatePDFSummary(
     let y = 50;
 
     // Header
-    doc.font("Helvetica-Bold").fontSize(18).text(`Invoice Summary — ${preferences.businessName}`, 50, y);
+    doc.font("Helvetica-Bold").fontSize(18).text(`Invoice Summary - ${preferences.businessName}`, 50, y);
     y += 26;
-    doc.font("Helvetica").fontSize(10).text(`${formatDate(dateFrom)} — ${formatDate(dateTo)}`, 50, y);
+    doc.font("Helvetica").fontSize(10).text(`${formatDate(dateFrom)} to ${formatDate(dateTo)}`, 50, y);
     y += 20;
     doc.font("Helvetica").fontSize(8).fillColor("#666666").text(`Generated: ${formatDate(today)}`, 50, y);
     y += 20;

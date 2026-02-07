@@ -140,7 +140,7 @@ export default function CreateInvoice() {
   }
 
   async function handleSubmit(values: Record<string, string | boolean | Date>) {
-    // --- Validate all fields ---
+    // Validate all fields
     let hasErrors = false;
     const newErrors: Record<string, string | undefined> = {};
 
@@ -185,7 +185,7 @@ export default function CreateInvoice() {
       client = found;
     }
 
-    // --- Validate and parse line items ---
+    // Validate and parse line items
     const lineItems: InvoiceLineItem[] = [];
     for (let i = 0; i < lineItemCount; i++) {
       const desc = (values[`desc_${i}`] as string || "").trim();
@@ -208,7 +208,7 @@ export default function CreateInvoice() {
       }
     }
 
-    // --- Dates ---
+    // Dates
     const invoiceDateVal = values.invoiceDate as Date;
     const dueDateVal = values.dueDate as Date;
 
@@ -224,12 +224,12 @@ export default function CreateInvoice() {
     const invoiceDate = invoiceDateVal;
     const dueDate = dueDateVal;
 
-    // --- Calculate totals ---
+    // Calculate totals
     const vatApplied = values.vatApplied as boolean;
     const vatRate = parseFloat(preferences.vatRate) || 0;
     const { subtotal, vatAmount, total } = calculateInvoiceTotals(lineItems, vatApplied, vatRate);
 
-    // --- Generate invoice ---
+    // Generate invoice
     try {
       const startingNum = parseInt(preferences.startingInvoiceNumber) || 1;
       const numberRaw = await getNextInvoiceNumber(startingNum);
@@ -350,7 +350,7 @@ export default function CreateInvoice() {
       <Form.Separator />
 
       {Array.from({ length: lineItemCount }, (_, i) => [
-        <Form.Description key={`header_${i}`} title="" text={`— Line Item ${i + 1} —`} />,
+        <Form.Description key={`header_${i}`} title="" text={`- Line Item ${i + 1} -`} />,
         <Form.TextArea
           key={`desc_${i}`}
           id={`desc_${i}`}

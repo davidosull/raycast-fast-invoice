@@ -3,7 +3,7 @@ import fs from "fs";
 import { STORAGE_KEYS } from "./constants";
 import { Client, Invoice, InvoiceCounter, InvoiceStatus } from "./types";
 
-// --- Clients ---
+// Clients
 
 export async function getClients(): Promise<Client[]> {
   const data = await LocalStorage.getItem<string>(STORAGE_KEYS.clients);
@@ -33,7 +33,7 @@ export async function deleteClient(id: string): Promise<void> {
   await saveClients(clients.filter((c) => c.id !== id));
 }
 
-// --- Invoices ---
+// Invoices
 
 export async function getInvoices(): Promise<Invoice[]> {
   const data = await LocalStorage.getItem<string>(STORAGE_KEYS.invoices);
@@ -75,7 +75,7 @@ export async function deleteInvoice(id: string): Promise<void> {
   await saveInvoices(invoices.filter((inv) => inv.id !== id));
 }
 
-// --- Invoice Counter ---
+// Invoice Counter
 
 export async function getNextInvoiceNumber(startingNumber: number): Promise<number> {
   const data = await LocalStorage.getItem<string>(STORAGE_KEYS.invoiceCounter);
@@ -91,7 +91,7 @@ export async function getNextInvoiceNumber(startingNumber: number): Promise<numb
   return nextNumber;
 }
 
-// --- Helpers ---
+// Helpers
 
 export async function getInvoiceCountForClient(clientId: string): Promise<number> {
   const invoices = await getInvoices();

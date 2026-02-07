@@ -97,7 +97,7 @@ export default function ListInvoices() {
         filtered.map((inv) => (
           <List.Item
             key={inv.id}
-            title={`${inv.invoiceNumber} — ${inv.clientName}`}
+            title={`${inv.invoiceNumber} - ${inv.clientName}`}
             subtitle={`${formatCurrency(inv.total)}${inv.vatApplied ? " inc. VAT" : " no VAT"}`}
             keywords={[inv.clientName, inv.invoiceNumber, String(inv.total)]}
             accessories={[
