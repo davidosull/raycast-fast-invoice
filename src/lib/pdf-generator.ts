@@ -73,6 +73,8 @@ export async function generateInvoicePDF(
     doc.font("Helvetica").fontSize(7).fillColor(MID_GREY).text("From", colLeft, y);
     y += 12;
     const fromStartY = y;
+    doc.font("Helvetica-Bold").fontSize(8.5).fillColor(BLACK).text(preferences.yourName, colLeft, y);
+    y += 12;
     doc.font("Helvetica").fontSize(8.5).fillColor(BLACK);
     for (const line of parseAddress(preferences.businessAddress)) {
       doc.text(line, colLeft, y);

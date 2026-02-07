@@ -1,8 +1,8 @@
 {
   "$schema": "https://www.raycast.com/schemas/extension.json",
   "name": "invoice-generator",
-  "title": "Invoice Generator",
-  "description": "Generate clean PDF invoices quickly",
+  "title": "Fast Invoice",
+  "description": "Create and manage professional PDF invoices in seconds. Track clients, export records, and get paid faster.",
   "icon": "command-icon.png",
   "author": "davidobuilds",
   "categories": ["Finance", "Productivity"],
@@ -64,19 +64,19 @@
       "title": "Business Email",
       "description": "Contact email shown on invoices",
       "type": "textfield",
-      "required": false
+      "required": true
     },
     {
       "name": "businessPhone",
       "title": "Business Phone",
       "description": "Contact phone shown on invoices",
       "type": "textfield",
-      "required": false
+      "required": true
     },
     {
       "name": "bankName",
       "title": "Bank Name",
-      "description": "Bank name for payment details",
+      "description": "Bank details are printed on invoices so clients can pay you directly",
       "type": "textfield",
       "required": true
     },

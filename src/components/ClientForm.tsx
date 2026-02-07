@@ -15,8 +15,9 @@ export default function ClientForm({ client, onSaved }: ClientFormProps) {
   const [emailError, setEmailError] = useState<string | undefined>();
   const isEditing = !!client;
 
-  async function handleSubmit(values: { name: string; email: string; address: string }) {
+  async function handleSubmit(values: { name: string; contactName: string; email: string; address: string }) {
     const name = values.name.trim();
+    const contactName = values.contactName.trim();
     const email = values.email.trim();
     const address = values.address.trim();
 
@@ -35,6 +36,7 @@ export default function ClientForm({ client, onSaved }: ClientFormProps) {
         await updateClient({
           ...client,
           name,
+          contactName,
           email,
           address,
           updatedAt: now,
@@ -44,6 +46,7 @@ export default function ClientForm({ client, onSaved }: ClientFormProps) {
         await addClient({
           id: uuidv4(),
           name,
+          contactName,
           email,
           address,
           createdAt: now,
@@ -73,11 +76,17 @@ export default function ClientForm({ client, onSaved }: ClientFormProps) {
     >
       <Form.TextField
         id="name"
-        title="Name"
-        placeholder="Client name"
+        title="Company Name"
+        placeholder="Company or trading name"
         defaultValue={client?.name ?? ""}
         error={nameError}
         onChange={() => nameError && setNameError(undefined)}
+      />
+      <Form.TextField
+        id="contactName"
+        title="Contact Name"
+        placeholder="First name or full name"
+        defaultValue={client?.contactName ?? ""}
       />
       <Form.TextField
         id="email"

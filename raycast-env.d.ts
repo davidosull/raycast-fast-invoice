@@ -15,10 +15,10 @@ type ExtensionPreferences = {
   /** Business Address - Full address shown on invoices. Use commas to separate lines. */
   "businessAddress": string,
   /** Business Email - Contact email shown on invoices */
-  "businessEmail"?: string,
+  "businessEmail": string,
   /** Business Phone - Contact phone shown on invoices */
-  "businessPhone"?: string,
-  /** Bank Name - Bank name for payment details */
+  "businessPhone": string,
+  /** Bank Name - Bank details are printed on invoices so clients can pay you directly */
   "bankName": string,
   /** Account Name - Account holder name */
   "accountName": string,

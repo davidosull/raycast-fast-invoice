@@ -35,14 +35,25 @@ export function resolveSaveLocation(saveLocation: string): string {
   return saveLocation;
 }
 
+export function getClientGreetingName(invoice: Invoice): string {
+  if (invoice.clientContactName) {
+    return invoice.clientContactName.split(" ")[0];
+  }
+  return invoice.clientName.split(" ")[0];
+}
+
+export function buildEmailBody(invoice: Invoice, preferences: Preferences): string {
+  const firstName = getClientGreetingName(invoice);
+  return `Hi ${firstName},\n\nPlease find attached invoice ${invoice.invoiceNumber} for ${formatCurrency(invoice.total)}. Payment due by ${formatDate(invoice.dueDate)}.\n\nAny issues, just let me know.\n\nThanks,\n${preferences.yourName}`;
+}
+
+export function buildEmailSubject(invoice: Invoice, preferences: Preferences): string {
+  return `Invoice ${invoice.invoiceNumber} from ${preferences.businessName}`;
+}
+
 export function buildMailtoLink(invoice: Invoice, preferences: Preferences): string {
-  const firstName = invoice.clientName.split(" ")[0];
-  const subject = encodeURIComponent(
-    `Invoice ${invoice.invoiceNumber} from ${preferences.businessName}`
-  );
-  const body = encodeURIComponent(
-    `Hi ${firstName},\n\nPlease find attached invoice ${invoice.invoiceNumber} for ${formatCurrency(invoice.total)}.\n\nPayment is due by ${formatDate(invoice.dueDate)}.\n\nThanks,\n${preferences.yourName}`
-  );
+  const subject = encodeURIComponent(buildEmailSubject(invoice, preferences));
+  const body = encodeURIComponent(buildEmailBody(invoice, preferences));
   return `mailto:${invoice.clientEmail}?subject=${subject}&body=${body}`;
 }
 

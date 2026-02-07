@@ -151,7 +151,7 @@ export default function ListInvoices() {
                     <Action
                       title="Mark as Paid"
                       icon={Icon.CheckCircle}
-                      shortcut={{ modifiers: ["cmd"], key: "p" }}
+                      shortcut={{ modifiers: ["cmd", "shift"], key: "p" }}
                       onAction={() => handleStatusChange(inv, "paid")}
                     />
                   )}

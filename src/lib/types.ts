@@ -1,6 +1,7 @@
 export interface Client {
   id: string;
   name: string;
+  contactName?: string;
   email: string;
   address: string;
   createdAt: string;
@@ -22,6 +23,7 @@ export interface Invoice {
   numberRaw: number;
   clientId: string;
   clientName: string;
+  clientContactName?: string;
   clientEmail: string;
   clientAddress: string;
   invoiceDate: string;
