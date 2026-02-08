@@ -82,8 +82,10 @@ export default function ManageClients() {
           <List.Item
             key={client.id}
             title={client.name}
-            subtitle={client.email}
+            subtitle={client.contactName || client.email}
             accessories={[
+              ...(client.contactName ? [{ text: client.email }] : []),
+              ...(client.address ? [{ text: client.address.split(",")[0].trim() }] : []),
               {
                 text: `${invoiceCounts[client.id] ?? 0} invoice${(invoiceCounts[client.id] ?? 0) === 1 ? "" : "s"}`,
               },

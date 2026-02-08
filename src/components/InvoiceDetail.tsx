@@ -5,9 +5,10 @@ import { Invoice, Preferences } from "../lib/types";
 
 interface InvoiceDetailProps {
   invoice: Invoice;
+  onDuplicate?: () => void;
 }
 
-export default function InvoiceDetail({ invoice }: InvoiceDetailProps) {
+export default function InvoiceDetail({ invoice, onDuplicate }: InvoiceDetailProps) {
   const preferences = getPreferenceValues<Preferences>();
 
   const lineItemsTable = invoice.lineItems
@@ -82,6 +83,14 @@ ${invoice.notes ? `---\n\n## Notes\n${invoice.notes}` : ""}
               await showToast({ style: Toast.Style.Success, title: "Summary copied" });
             }}
           />
+          {onDuplicate && (
+            <Action
+              title="Duplicate Invoice"
+              icon={Icon.CopyClipboard}
+              shortcut={{ modifiers: ["cmd"], key: "d" }}
+              onAction={onDuplicate}
+            />
+          )}
         </ActionPanel>
       }
     />

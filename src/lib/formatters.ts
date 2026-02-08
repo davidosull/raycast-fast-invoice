@@ -57,6 +57,15 @@ export function buildMailtoLink(invoice: Invoice, preferences: Preferences): str
   return `mailto:${invoice.clientEmail}?subject=${subject}&body=${body}`;
 }
 
+export function isOverdue(invoice: Invoice): boolean {
+  if (invoice.status === "paid") return false;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const due = new Date(invoice.dueDate);
+  due.setHours(0, 0, 0, 0);
+  return due < today;
+}
+
 export function buildInvoiceSummary(invoice: Invoice): string {
   const lines = [
     `Invoice: ${invoice.invoiceNumber}`,

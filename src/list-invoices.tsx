@@ -3,6 +3,7 @@ import {
   ActionPanel,
   Alert,
   Clipboard,
+  Color,
   confirmAlert,
   getPreferenceValues,
   Icon,
@@ -14,10 +15,12 @@ import {
   useNavigation,
 } from "@raycast/api";
 import { useCallback, useEffect, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 import InvoiceDetail from "./components/InvoiceDetail";
 import { STATUS_COLORS, STATUS_LABELS } from "./lib/constants";
-import { formatCurrency, formatDate, buildMailtoLink, buildInvoiceSummary } from "./lib/formatters";
-import { deleteInvoice, getInvoices, updateInvoiceStatus } from "./lib/storage";
+import { formatCurrency, formatDate, formatInvoiceNumber, isOverdue, buildMailtoLink, buildInvoiceSummary } from "./lib/formatters";
+import { generateInvoicePDF } from "./lib/pdf-generator";
+import { addInvoice, deleteInvoice, getInvoices, getNextInvoiceNumber, updateInvoiceStatus } from "./lib/storage";
 import { Invoice, InvoiceStatus, Preferences } from "./lib/types";
 
 export default function ListInvoices() {
@@ -53,6 +56,40 @@ export default function ListInvoices() {
     await updateInvoiceStatus(invoice.id, status);
     await showToast({ style: Toast.Style.Success, title: `Marked as ${STATUS_LABELS[status]}` });
     await loadInvoices();
+  }
+
+  async function handleDuplicate(invoice: Invoice) {
+    try {
+      const startingNum = parseInt(preferences.startingInvoiceNumber) || 1;
+      const numberRaw = await getNextInvoiceNumber(startingNum);
+      const invoiceNumber = formatInvoiceNumber(preferences.invoicePrefix, numberRaw);
+
+      const today = new Date();
+      const dueDate = new Date(today);
+      dueDate.setDate(dueDate.getDate() + (parseInt(preferences.paymentTermsDays) || 30));
+      const now = new Date().toISOString();
+
+      const newInvoice: Invoice = {
+        ...invoice,
+        id: uuidv4(),
+        invoiceNumber,
+        numberRaw,
+        invoiceDate: today.toISOString().split("T")[0],
+        dueDate: dueDate.toISOString().split("T")[0],
+        status: "draft",
+        pdfPath: "",
+        createdAt: now,
+        updatedAt: now,
+      };
+
+      const pdfPath = await generateInvoicePDF(newInvoice, preferences);
+      newInvoice.pdfPath = pdfPath;
+      await addInvoice(newInvoice);
+      await showToast({ style: Toast.Style.Success, title: `Duplicated as ${invoiceNumber}` });
+      await loadInvoices();
+    } catch (error) {
+      await showToast({ style: Toast.Style.Failure, title: "Failed to duplicate", message: String(error) });
+    }
   }
 
   async function handleDelete(invoice: Invoice) {
@@ -102,7 +139,9 @@ export default function ListInvoices() {
             keywords={[inv.clientName, inv.invoiceNumber, String(inv.total)]}
             accessories={[
               { date: new Date(inv.invoiceDate) },
-              { tag: { value: STATUS_LABELS[inv.status], color: STATUS_COLORS[inv.status] } },
+              isOverdue(inv)
+                ? { tag: { value: "Overdue", color: Color.Red } }
+                : { tag: { value: STATUS_LABELS[inv.status], color: STATUS_COLORS[inv.status] } },
             ]}
             actions={
               <ActionPanel>
@@ -114,8 +153,8 @@ export default function ListInvoices() {
                 <Action
                   title="View Details"
                   icon={Icon.Eye}
-                  shortcut={{ modifiers: ["cmd"], key: "d" }}
-                  onAction={() => push(<InvoiceDetail invoice={inv} />)}
+                  shortcut={{ modifiers: ["cmd"], key: "return" }}
+                  onAction={() => push(<InvoiceDetail invoice={inv} onDuplicate={() => handleDuplicate(inv)} />)}
                 />
                 <Action
                   title="Open in Finder"
@@ -164,6 +203,12 @@ export default function ListInvoices() {
                   )}
                 </ActionPanel.Section>
                 <ActionPanel.Section>
+                  <Action
+                    title="Duplicate Invoice"
+                    icon={Icon.CopyClipboard}
+                    shortcut={{ modifiers: ["cmd"], key: "d" }}
+                    onAction={() => handleDuplicate(inv)}
+                  />
                   <Action
                     title="Copy Invoice Summary"
                     icon={Icon.Text}

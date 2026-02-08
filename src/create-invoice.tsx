@@ -28,6 +28,8 @@ export default function CreateInvoice() {
   const [lineItemCount, setLineItemCount] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [successInvoice, setSuccessInvoice] = useState<Invoice | null>(null);
+  const [lineItemValues, setLineItemValues] = useState<Record<string, string>>({});
+  const [vatChecked, setVatChecked] = useState(preferences.vatRegistered);
 
   const initialToday = new Date();
   initialToday.setHours(0, 0, 0, 0);
@@ -85,6 +87,20 @@ export default function CreateInvoice() {
     clearError(field);
     return true;
   }
+
+  function updateLineItemValue(key: string, value: string) {
+    setLineItemValues((prev) => ({ ...prev, [key]: value }));
+  }
+
+  const runningTotal = (() => {
+    const vatRate = parseFloat(preferences.vatRate) || 0;
+    const items = Array.from({ length: lineItemCount }, (_, i) => {
+      const qty = parseFloat(lineItemValues[`qty_${i}`] || "1") || 0;
+      const rate = parseFloat(lineItemValues[`rate_${i}`] || "0") || 0;
+      return { description: "", quantity: qty, rate, lineTotal: calculateLineTotal(qty, rate) };
+    });
+    return calculateInvoiceTotals(items, vatChecked, vatRate);
+  })();
 
   useEffect(() => {
     getClients().then((data) => {
@@ -367,7 +383,7 @@ export default function CreateInvoice() {
           placeholder="1"
           defaultValue="1"
           error={errors[`qty_${i}`]}
-          onChange={() => clearError(`qty_${i}`)}
+          onChange={(v) => { clearError(`qty_${i}`); updateLineItemValue(`qty_${i}`, v); }}
           onBlur={(e) => validateNumber(`qty_${i}`, e.target.value as string, "Quantity")}
         />,
         <Form.TextField
@@ -376,14 +392,24 @@ export default function CreateInvoice() {
           title={`Rate (£) ${i + 1}`}
           placeholder="0.00"
           error={errors[`rate_${i}`]}
-          onChange={() => clearError(`rate_${i}`)}
+          onChange={(v) => { clearError(`rate_${i}`); updateLineItemValue(`rate_${i}`, v); }}
           onBlur={(e) => validateNumber(`rate_${i}`, e.target.value as string, "Rate", false)}
         />,
       ]).flat()}
 
+      <Form.Description title="" text="⌘L to add a line  ·  ⌘⇧L to remove" />
+
       <Form.Separator />
 
-      <Form.Checkbox id="vatApplied" label="Apply VAT" title="VAT" defaultValue={preferences.vatRegistered} />
+      <Form.Checkbox id="vatApplied" label="Apply VAT" title="VAT" defaultValue={preferences.vatRegistered} onChange={setVatChecked} />
+
+      {runningTotal.subtotal > 0 && (
+        <Form.Description
+          title="Total"
+          text={`Subtotal: ${formatCurrency(runningTotal.subtotal)}${vatChecked ? `  |  VAT (${preferences.vatRate}%): ${formatCurrency(runningTotal.vatAmount)}` : ""}  |  Total: ${formatCurrency(runningTotal.total)}`}
+        />
+      )}
+
       <Form.TextArea id="notes" title="Notes" placeholder="Optional notes..." />
     </Form>
   );
