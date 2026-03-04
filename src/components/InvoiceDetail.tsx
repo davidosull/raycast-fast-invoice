@@ -1,20 +1,35 @@
-import { Action, ActionPanel, Clipboard, Detail, getPreferenceValues, Icon, open, showInFinder, showToast, Toast } from "@raycast/api";
-import { formatCurrency, formatDate, buildMailtoLink, buildInvoiceSummary } from "../lib/formatters";
+import {
+  Action,
+  ActionPanel,
+  Clipboard,
+  Detail,
+  Icon,
+  open,
+  showInFinder,
+  showToast,
+  Toast,
+} from "@raycast/api";
+import {
+  formatCurrency,
+  formatDate,
+  buildInvoiceSummary,
+} from "../lib/formatters";
 import { STATUS_LABELS } from "../lib/constants";
-import { Invoice, Preferences } from "../lib/types";
+import { Invoice } from "../lib/types";
 
 interface InvoiceDetailProps {
   invoice: Invoice;
   onDuplicate?: () => void;
 }
 
-export default function InvoiceDetail({ invoice, onDuplicate }: InvoiceDetailProps) {
-  const preferences = getPreferenceValues<Preferences>();
-
+export default function InvoiceDetail({
+  invoice,
+  onDuplicate,
+}: InvoiceDetailProps) {
   const lineItemsTable = invoice.lineItems
     .map(
       (item) =>
-        `| ${item.description} | ${Number.isInteger(item.quantity) ? item.quantity : item.quantity.toFixed(2)} | ${formatCurrency(item.rate)} | ${formatCurrency(item.lineTotal)} |`
+        `| ${item.description} | ${Number.isInteger(item.quantity) ? item.quantity : item.quantity.toFixed(2)} | ${formatCurrency(item.rate)} | ${formatCurrency(item.lineTotal)} |`,
     )
     .join("\n");
 
@@ -57,13 +72,16 @@ ${invoice.notes ? `---\n\n## Notes\n${invoice.notes}` : ""}
       navigationTitle={invoice.invoiceNumber}
       actions={
         <ActionPanel>
-          <Action title="Open PDF" icon={Icon.Document} onAction={() => open(invoice.pdfPath)} />
-          <Action title="Open in Finder" icon={Icon.Finder} shortcut={{ modifiers: ["cmd"], key: "o" }} onAction={() => showInFinder(invoice.pdfPath)} />
-          <Action.OpenInBrowser
-            title="Compose Email"
-            icon={Icon.Envelope}
-            shortcut={{ modifiers: ["cmd"], key: "e" }}
-            url={buildMailtoLink(invoice, preferences)}
+          <Action
+            title="Open Pdf"
+            icon={Icon.Document}
+            onAction={() => open(invoice.pdfPath)}
+          />
+          <Action
+            title="Open in Finder"
+            icon={Icon.Finder}
+            shortcut={{ modifiers: ["cmd"], key: "o" }}
+            onAction={() => showInFinder(invoice.pdfPath)}
           />
           <Action
             title="Copy File Path"
@@ -71,7 +89,10 @@ ${invoice.notes ? `---\n\n## Notes\n${invoice.notes}` : ""}
             shortcut={{ modifiers: ["cmd"], key: "c" }}
             onAction={async () => {
               await Clipboard.copy(invoice.pdfPath);
-              await showToast({ style: Toast.Style.Success, title: "Path copied" });
+              await showToast({
+                style: Toast.Style.Success,
+                title: "Path copied",
+              });
             }}
           />
           <Action
@@ -80,7 +101,10 @@ ${invoice.notes ? `---\n\n## Notes\n${invoice.notes}` : ""}
             shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
             onAction={async () => {
               await Clipboard.copy(buildInvoiceSummary(invoice));
-              await showToast({ style: Toast.Style.Success, title: "Summary copied" });
+              await showToast({
+                style: Toast.Style.Success,
+                title: "Summary copied",
+              });
             }}
           />
           {onDuplicate && (

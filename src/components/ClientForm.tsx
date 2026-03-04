@@ -1,4 +1,11 @@
-import { Action, ActionPanel, Form, showToast, Toast, useNavigation } from "@raycast/api";
+import {
+  Action,
+  ActionPanel,
+  Form,
+  showToast,
+  Toast,
+  useNavigation,
+} from "@raycast/api";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { addClient, updateClient } from "../lib/storage";
@@ -15,7 +22,12 @@ export default function ClientForm({ client, onSaved }: ClientFormProps) {
   const [emailError, setEmailError] = useState<string | undefined>();
   const isEditing = !!client;
 
-  async function handleSubmit(values: { name: string; contactName: string; email: string; address: string }) {
+  async function handleSubmit(values: {
+    name: string;
+    contactName: string;
+    email: string;
+    address: string;
+  }) {
     const name = values.name.trim();
     const contactName = values.contactName.trim();
     const email = values.email.trim();
@@ -41,7 +53,10 @@ export default function ClientForm({ client, onSaved }: ClientFormProps) {
           address,
           updatedAt: now,
         });
-        await showToast({ style: Toast.Style.Success, title: "Client updated" });
+        await showToast({
+          style: Toast.Style.Success,
+          title: "Client updated",
+        });
       } else {
         await addClient({
           id: uuidv4(),
@@ -70,7 +85,10 @@ export default function ClientForm({ client, onSaved }: ClientFormProps) {
       navigationTitle={isEditing ? "Edit Client" : "Add Client"}
       actions={
         <ActionPanel>
-          <Action.SubmitForm title={isEditing ? "Update Client" : "Add Client"} onSubmit={handleSubmit} />
+          <Action.SubmitForm
+            title={isEditing ? "Update Client" : "Add Client"}
+            onSubmit={handleSubmit}
+          />
         </ActionPanel>
       }
     >

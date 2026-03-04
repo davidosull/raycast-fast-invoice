@@ -1,6 +1,6 @@
 import { homedir } from "os";
 import path from "path";
-import { Invoice, Preferences } from "./types";
+import { Invoice } from "./types";
 
 export function formatCurrency(amount: number): string {
   return `£${amount.toLocaleString("en-GB", {
@@ -35,28 +35,6 @@ export function resolveSaveLocation(saveLocation: string): string {
   return saveLocation;
 }
 
-export function getClientGreetingName(invoice: Invoice): string {
-  if (invoice.clientContactName) {
-    return invoice.clientContactName.split(" ")[0];
-  }
-  return invoice.clientName.split(" ")[0];
-}
-
-export function buildEmailBody(invoice: Invoice, preferences: Preferences): string {
-  const firstName = getClientGreetingName(invoice);
-  return `Hi ${firstName},\n\nPlease find attached invoice ${invoice.invoiceNumber} for ${formatCurrency(invoice.total)}. Payment due by ${formatDate(invoice.dueDate)}.\n\nAny issues, just let me know.\n\nThanks,\n${preferences.yourName}`;
-}
-
-export function buildEmailSubject(invoice: Invoice, preferences: Preferences): string {
-  return `Invoice ${invoice.invoiceNumber} from ${preferences.businessName}`;
-}
-
-export function buildMailtoLink(invoice: Invoice, preferences: Preferences): string {
-  const subject = encodeURIComponent(buildEmailSubject(invoice, preferences));
-  const body = encodeURIComponent(buildEmailBody(invoice, preferences));
-  return `mailto:${invoice.clientEmail}?subject=${subject}&body=${body}`;
-}
-
 export function isOverdue(invoice: Invoice): boolean {
   if (invoice.status === "paid") return false;
   const today = new Date();
@@ -75,18 +53,22 @@ export function buildInvoiceSummary(invoice: Invoice): string {
     "",
     ...invoice.lineItems.map(
       (item) =>
-        `${item.description} - ${item.quantity} x ${formatCurrency(item.rate)} = ${formatCurrency(item.lineTotal)}`
+        `${item.description} - ${item.quantity} x ${formatCurrency(item.rate)} = ${formatCurrency(item.lineTotal)}`,
     ),
     "",
     `Subtotal: ${formatCurrency(invoice.subtotal)}`,
   ];
 
   if (invoice.vatApplied) {
-    lines.push(`VAT (${invoice.vatRate}%): ${formatCurrency(invoice.vatAmount)}`);
+    lines.push(
+      `VAT (${invoice.vatRate}%): ${formatCurrency(invoice.vatAmount)}`,
+    );
   }
 
   lines.push(`Total: ${formatCurrency(invoice.total)}`);
-  lines.push(`Status: ${invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}`);
+  lines.push(
+    `Status: ${invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}`,
+  );
 
   return lines.join("\n");
 }

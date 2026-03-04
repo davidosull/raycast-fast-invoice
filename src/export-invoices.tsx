@@ -1,12 +1,10 @@
 import {
   Action,
   ActionPanel,
-  Clipboard,
   Form,
   getPreferenceValues,
   Icon,
   open,
-  showInFinder,
   showToast,
   Toast,
 } from "@raycast/api";
@@ -17,7 +15,7 @@ import { generateCSV } from "./lib/csv-generator";
 import { resolveSaveLocation } from "./lib/formatters";
 import { generatePDFSummary } from "./lib/pdf-summary-generator";
 import { getClients, getInvoices } from "./lib/storage";
-import { Client, Invoice, Preferences } from "./lib/types";
+import { Client, Preferences } from "./lib/types";
 
 function getTaxYearStart(): Date {
   const now = new Date();
@@ -88,8 +86,15 @@ export default function ExportInvoices() {
         const fromStr = dateFrom
           ? dateFrom.toISOString().split("T")[0]
           : getTaxYearStart().toISOString().split("T")[0];
-        const toStr = dateTo ? dateTo.toISOString().split("T")[0] : new Date().toISOString().split("T")[0];
-        filePath = await generatePDFSummary(invoices, preferences, fromStr, toStr);
+        const toStr = dateTo
+          ? dateTo.toISOString().split("T")[0]
+          : new Date().toISOString().split("T")[0];
+        filePath = await generatePDFSummary(
+          invoices,
+          preferences,
+          fromStr,
+          toStr,
+        );
       }
 
       await showToast({ style: Toast.Style.Success, title: "Export complete" });
@@ -111,7 +116,11 @@ export default function ExportInvoices() {
       navigationTitle="Export Invoices"
       actions={
         <ActionPanel>
-          <Action.SubmitForm title="Export" icon={Icon.Download} onSubmit={handleSubmit} />
+          <Action.SubmitForm
+            title="Export"
+            icon={Icon.Download}
+            onSubmit={handleSubmit}
+          />
         </ActionPanel>
       }
     >
@@ -120,17 +129,29 @@ export default function ExportInvoices() {
         <Form.Dropdown.Item value="pdf" title="PDF Summary" />
       </Form.Dropdown>
 
-      <Form.DatePicker id="dateFrom" title="Date From" defaultValue={getTaxYearStart()} />
+      <Form.DatePicker
+        id="dateFrom"
+        title="Date From"
+        defaultValue={getTaxYearStart()}
+      />
       <Form.DatePicker id="dateTo" title="Date To" defaultValue={new Date()} />
 
-      <Form.Dropdown id="clientFilter" title="Filter by Client" defaultValue="all">
+      <Form.Dropdown
+        id="clientFilter"
+        title="Filter by Client"
+        defaultValue="all"
+      >
         <Form.Dropdown.Item value="all" title="All Clients" />
         {clients.map((c) => (
           <Form.Dropdown.Item key={c.id} value={c.id} title={c.name} />
         ))}
       </Form.Dropdown>
 
-      <Form.Dropdown id="statusFilter" title="Filter by Status" defaultValue="all">
+      <Form.Dropdown
+        id="statusFilter"
+        title="Filter by Status"
+        defaultValue="all"
+      >
         <Form.Dropdown.Item value="all" title="All Statuses" />
         <Form.Dropdown.Item value="draft" title="Draft" />
         <Form.Dropdown.Item value="sent" title="Sent" />

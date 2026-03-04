@@ -14,9 +14,18 @@ import {
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { calculateInvoiceTotals, calculateLineTotal } from "./lib/calculations";
-import { formatCurrency, formatDate, formatInvoiceNumber, buildMailtoLink, buildInvoiceSummary } from "./lib/formatters";
+import {
+  formatCurrency,
+  formatInvoiceNumber,
+  buildInvoiceSummary,
+} from "./lib/formatters";
 import { generateInvoicePDF } from "./lib/pdf-generator";
-import { addClient, addInvoice, getClients, getNextInvoiceNumber } from "./lib/storage";
+import {
+  addClient,
+  addInvoice,
+  getClients,
+  getNextInvoiceNumber,
+} from "./lib/storage";
 import { Client, Invoice, InvoiceLineItem, Preferences } from "./lib/types";
 
 const NEW_CLIENT_ID = "__new__";
@@ -28,13 +37,17 @@ export default function CreateInvoice() {
   const [lineItemCount, setLineItemCount] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [successInvoice, setSuccessInvoice] = useState<Invoice | null>(null);
-  const [lineItemValues, setLineItemValues] = useState<Record<string, string>>({});
+  const [lineItemValues, setLineItemValues] = useState<Record<string, string>>(
+    {},
+  );
   const [vatChecked, setVatChecked] = useState(preferences.vatRegistered);
 
   const initialToday = new Date();
   initialToday.setHours(0, 0, 0, 0);
   const initialDue = new Date(initialToday);
-  initialDue.setDate(initialDue.getDate() + (parseInt(preferences.paymentTermsDays) || 30));
+  initialDue.setDate(
+    initialDue.getDate() + (parseInt(preferences.paymentTermsDays) || 30),
+  );
   const [invoiceDate, setInvoiceDate] = useState<Date | null>(initialToday);
   const [dueDate, setDueDate] = useState<Date | null>(initialDue);
   const [errors, setErrors] = useState<Record<string, string | undefined>>({});
@@ -50,7 +63,11 @@ export default function CreateInvoice() {
     });
   }
 
-  function validateRequired(field: string, value: string | undefined, label: string): boolean {
+  function validateRequired(
+    field: string,
+    value: string | undefined,
+    label: string,
+  ): boolean {
     if (!(value || "").trim()) {
       setError(field, `${label} is required`);
       return false;
@@ -59,7 +76,12 @@ export default function CreateInvoice() {
     return true;
   }
 
-  function validateNumber(field: string, value: string | undefined, label: string, allowZero = true): boolean {
+  function validateNumber(
+    field: string,
+    value: string | undefined,
+    label: string,
+    allowZero = true,
+  ): boolean {
     const trimmed = (value || "").trim();
     if (!trimmed) {
       setError(field, `${label} is required`);
@@ -68,20 +90,6 @@ export default function CreateInvoice() {
     const num = parseFloat(trimmed);
     if (isNaN(num) || num < 0 || (!allowZero && num === 0)) {
       setError(field, `Enter a valid ${label.toLowerCase()}`);
-      return false;
-    }
-    clearError(field);
-    return true;
-  }
-
-  function validateEmail(field: string, value: string | undefined): boolean {
-    const trimmed = (value || "").trim();
-    if (!trimmed) {
-      setError(field, "Email is required");
-      return false;
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
-      setError(field, "Enter a valid email address");
       return false;
     }
     clearError(field);
@@ -97,7 +105,12 @@ export default function CreateInvoice() {
     const items = Array.from({ length: lineItemCount }, (_, i) => {
       const qty = parseFloat(lineItemValues[`qty_${i}`] || "1") || 0;
       const rate = parseFloat(lineItemValues[`rate_${i}`] || "0") || 0;
-      return { description: "", quantity: qty, rate, lineTotal: calculateLineTotal(qty, rate) };
+      return {
+        description: "",
+        quantity: qty,
+        rate,
+        lineTotal: calculateLineTotal(qty, rate),
+      };
     });
     return calculateInvoiceTotals(items, vatChecked, vatRate);
   })();
@@ -115,28 +128,25 @@ export default function CreateInvoice() {
         markdown={`# Invoice Created\n\n${buildInvoiceSummary(successInvoice)}\n\n**PDF saved to:** \`${successInvoice.pdfPath}\``}
         actions={
           <ActionPanel>
-            <Action title="Open PDF" icon={Icon.Document} onAction={() => open(successInvoice.pdfPath)} />
-            <Action title="Open in Finder" icon={Icon.Finder} onAction={() => showInFinder(successInvoice.pdfPath)} />
+            <Action
+              title="Open Pdf"
+              icon={Icon.Document}
+              onAction={() => open(successInvoice.pdfPath)}
+            />
+            <Action
+              title="Open in Finder"
+              icon={Icon.Finder}
+              onAction={() => showInFinder(successInvoice.pdfPath)}
+            />
             <Action
               title="Copy File Path"
               icon={Icon.Clipboard}
               shortcut={{ modifiers: ["cmd"], key: "c" }}
               onAction={async () => {
                 await Clipboard.copy(successInvoice.pdfPath);
-                await showToast({ style: Toast.Style.Success, title: "Path copied" });
-              }}
-            />
-            <Action
-              title="Compose Email"
-              icon={Icon.Envelope}
-              shortcut={{ modifiers: ["cmd"], key: "e" }}
-              onAction={async () => {
-                await Clipboard.copy({ file: successInvoice.pdfPath });
-                open(buildMailtoLink(successInvoice, preferences));
                 await showToast({
                   style: Toast.Style.Success,
-                  title: "Invoice PDF copied to clipboard",
-                  message: "Paste into your email to attach",
+                  title: "Path copied",
                 });
               }}
             />
@@ -146,7 +156,10 @@ export default function CreateInvoice() {
               shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
               onAction={async () => {
                 await Clipboard.copy(buildInvoiceSummary(successInvoice));
-                await showToast({ style: Toast.Style.Success, title: "Summary copied" });
+                await showToast({
+                  style: Toast.Style.Success,
+                  title: "Summary copied",
+                });
               }}
             />
           </ActionPanel>
@@ -164,21 +177,31 @@ export default function CreateInvoice() {
     let client: Client;
 
     if (clientId === NEW_CLIENT_ID) {
-      const newName = (values.newClientName as string || "").trim();
-      const newContactName = (values.newClientContactName as string || "").trim();
-      const newEmail = (values.newClientEmail as string || "").trim();
-      const newAddress = (values.newClientAddress as string || "").trim();
+      const newName = ((values.newClientName as string) || "").trim();
+      const newContactName = (
+        (values.newClientContactName as string) || ""
+      ).trim();
+      const newEmail = ((values.newClientEmail as string) || "").trim();
+      const newAddress = ((values.newClientAddress as string) || "").trim();
 
-      if (!newName) { newErrors.newClientName = "Client name is required"; hasErrors = true; }
+      if (!newName) {
+        newErrors.newClientName = "Client name is required";
+        hasErrors = true;
+      }
       if (!newEmail) {
-        newErrors.newClientEmail = "Email is required"; hasErrors = true;
+        newErrors.newClientEmail = "Email is required";
+        hasErrors = true;
       } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) {
-        newErrors.newClientEmail = "Enter a valid email address"; hasErrors = true;
+        newErrors.newClientEmail = "Enter a valid email address";
+        hasErrors = true;
       }
 
       if (hasErrors) {
         setErrors((prev) => ({ ...prev, ...newErrors }));
-        await showToast({ style: Toast.Style.Failure, title: "Please fix the errors above" });
+        await showToast({
+          style: Toast.Style.Failure,
+          title: "Please fix the errors above",
+        });
         return;
       }
 
@@ -195,7 +218,10 @@ export default function CreateInvoice() {
     } else {
       const found = clients.find((c) => c.id === clientId);
       if (!found) {
-        await showToast({ style: Toast.Style.Failure, title: "Please select a client" });
+        await showToast({
+          style: Toast.Style.Failure,
+          title: "Please select a client",
+        });
         return;
       }
       client = found;
@@ -204,15 +230,24 @@ export default function CreateInvoice() {
     // Validate and parse line items
     const lineItems: InvoiceLineItem[] = [];
     for (let i = 0; i < lineItemCount; i++) {
-      const desc = (values[`desc_${i}`] as string || "").trim();
-      const qtyStr = (values[`qty_${i}`] as string || "").trim();
-      const rateStr = (values[`rate_${i}`] as string || "").trim();
+      const desc = ((values[`desc_${i}`] as string) || "").trim();
+      const qtyStr = ((values[`qty_${i}`] as string) || "").trim();
+      const rateStr = ((values[`rate_${i}`] as string) || "").trim();
 
-      if (!desc) { newErrors[`desc_${i}`] = "Description is required"; hasErrors = true; }
+      if (!desc) {
+        newErrors[`desc_${i}`] = "Description is required";
+        hasErrors = true;
+      }
       const qty = parseFloat(qtyStr || "1");
       const rate = parseFloat(rateStr);
-      if (isNaN(qty) || qty < 0) { newErrors[`qty_${i}`] = "Enter a valid quantity"; hasErrors = true; }
-      if (!rateStr || isNaN(rate)) { newErrors[`rate_${i}`] = "Enter a valid rate"; hasErrors = true; }
+      if (isNaN(qty) || qty < 0) {
+        newErrors[`qty_${i}`] = "Enter a valid quantity";
+        hasErrors = true;
+      }
+      if (!rateStr || isNaN(rate)) {
+        newErrors[`rate_${i}`] = "Enter a valid rate";
+        hasErrors = true;
+      }
 
       if (!hasErrors) {
         lineItems.push({
@@ -228,12 +263,21 @@ export default function CreateInvoice() {
     const invoiceDateVal = values.invoiceDate as Date;
     const dueDateVal = values.dueDate as Date;
 
-    if (!invoiceDateVal) { newErrors.invoiceDate = "Invoice date is required"; hasErrors = true; }
-    if (!dueDateVal) { newErrors.dueDate = "Due date is required"; hasErrors = true; }
+    if (!invoiceDateVal) {
+      newErrors.invoiceDate = "Invoice date is required";
+      hasErrors = true;
+    }
+    if (!dueDateVal) {
+      newErrors.dueDate = "Due date is required";
+      hasErrors = true;
+    }
 
     if (hasErrors) {
       setErrors((prev) => ({ ...prev, ...newErrors }));
-      await showToast({ style: Toast.Style.Failure, title: "Please fix the errors above" });
+      await showToast({
+        style: Toast.Style.Failure,
+        title: "Please fix the errors above",
+      });
       return;
     }
 
@@ -243,13 +287,20 @@ export default function CreateInvoice() {
     // Calculate totals
     const vatApplied = values.vatApplied as boolean;
     const vatRate = parseFloat(preferences.vatRate) || 0;
-    const { subtotal, vatAmount, total } = calculateInvoiceTotals(lineItems, vatApplied, vatRate);
+    const { subtotal, vatAmount, total } = calculateInvoiceTotals(
+      lineItems,
+      vatApplied,
+      vatRate,
+    );
 
     // Generate invoice
     try {
       const startingNum = parseInt(preferences.startingInvoiceNumber) || 1;
       const numberRaw = await getNextInvoiceNumber(startingNum);
-      const invoiceNumber = formatInvoiceNumber(preferences.invoicePrefix, numberRaw);
+      const invoiceNumber = formatInvoiceNumber(
+        preferences.invoicePrefix,
+        numberRaw,
+      );
 
       const now = new Date().toISOString();
       const invoice: Invoice = {
@@ -269,7 +320,7 @@ export default function CreateInvoice() {
         vatRate: vatApplied ? vatRate : 0,
         vatAmount,
         total,
-        notes: (values.notes as string || "").trim(),
+        notes: ((values.notes as string) || "").trim(),
         status: "draft",
         pdfPath: "",
         createdAt: now,
@@ -288,7 +339,10 @@ export default function CreateInvoice() {
       // Save invoice
       await addInvoice(invoice);
 
-      await showToast({ style: Toast.Style.Success, title: `Invoice ${invoiceNumber} created` });
+      await showToast({
+        style: Toast.Style.Success,
+        title: `Invoice ${invoiceNumber} created`,
+      });
       setSuccessInvoice(invoice);
     } catch (error) {
       await showToast({
@@ -305,7 +359,11 @@ export default function CreateInvoice() {
       navigationTitle="Create Invoice"
       actions={
         <ActionPanel>
-          <Action.SubmitForm title="Create Invoice" icon={Icon.Document} onSubmit={handleSubmit} />
+          <Action.SubmitForm
+            title="Create Invoice"
+            icon={Icon.Document}
+            onSubmit={handleSubmit}
+          />
           <Action
             title="Add Line Item"
             icon={Icon.Plus}
@@ -323,9 +381,18 @@ export default function CreateInvoice() {
         </ActionPanel>
       }
     >
-      <Form.Dropdown id="clientId" title="Client" value={selectedClientId} onChange={setSelectedClientId}>
+      <Form.Dropdown
+        id="clientId"
+        title="Client"
+        value={selectedClientId}
+        onChange={setSelectedClientId}
+      >
         <Form.Dropdown.Item value="" title="Select a client..." />
-        <Form.Dropdown.Item value={NEW_CLIENT_ID} title="Add new" icon={Icon.Plus} />
+        <Form.Dropdown.Item
+          value={NEW_CLIENT_ID}
+          title="Add new"
+          icon={Icon.Plus}
+        />
         {clients.map((c) => (
           <Form.Dropdown.Item key={c.id} value={c.id} title={c.name} />
         ))}
@@ -339,7 +406,13 @@ export default function CreateInvoice() {
             placeholder="Company or trading name"
             error={errors.newClientName}
             onChange={() => clearError("newClientName")}
-            onBlur={(e) => validateRequired("newClientName", e.target.value as string, "Company name")}
+            onBlur={(e) =>
+              validateRequired(
+                "newClientName",
+                e.target.value as string,
+                "Company name",
+              )
+            }
           />
           <Form.TextField
             id="newClientContactName"
@@ -352,21 +425,42 @@ export default function CreateInvoice() {
             placeholder="client@example.com"
             error={errors.newClientEmail}
             onChange={() => clearError("newClientEmail")}
-            onBlur={(e) => validateEmail("newClientEmail", e.target.value as string)}
           />
-          <Form.TextArea id="newClientAddress" title="Address" placeholder="Street, City, Postcode" />
+          <Form.TextArea
+            id="newClientAddress"
+            title="Address"
+            placeholder="Street, City, Postcode"
+          />
         </>
       )}
 
       <Form.Separator />
 
-      <Form.DatePicker id="invoiceDate" title="Invoice Date" type={Form.DatePicker.Type.Date} value={invoiceDate} onChange={setInvoiceDate} error={errors.invoiceDate} />
-      <Form.DatePicker id="dueDate" title="Due Date" type={Form.DatePicker.Type.Date} value={dueDate} onChange={setDueDate} error={errors.dueDate} />
+      <Form.DatePicker
+        id="invoiceDate"
+        title="Invoice Date"
+        type={Form.DatePicker.Type.Date}
+        value={invoiceDate}
+        onChange={setInvoiceDate}
+        error={errors.invoiceDate}
+      />
+      <Form.DatePicker
+        id="dueDate"
+        title="Due Date"
+        type={Form.DatePicker.Type.Date}
+        value={dueDate}
+        onChange={setDueDate}
+        error={errors.dueDate}
+      />
 
       <Form.Separator />
 
       {Array.from({ length: lineItemCount }, (_, i) => [
-        <Form.Description key={`header_${i}`} title="" text={`- Line Item ${i + 1} -`} />,
+        <Form.Description
+          key={`header_${i}`}
+          title=""
+          text={`- Line Item ${i + 1} -`}
+        />,
         <Form.TextArea
           key={`desc_${i}`}
           id={`desc_${i}`}
@@ -374,7 +468,13 @@ export default function CreateInvoice() {
           placeholder="Service description"
           error={errors[`desc_${i}`]}
           onChange={() => clearError(`desc_${i}`)}
-          onBlur={(e) => validateRequired(`desc_${i}`, e.target.value as string, "Description")}
+          onBlur={(e) =>
+            validateRequired(
+              `desc_${i}`,
+              e.target.value as string,
+              "Description",
+            )
+          }
         />,
         <Form.TextField
           key={`qty_${i}`}
@@ -383,8 +483,13 @@ export default function CreateInvoice() {
           placeholder="1"
           defaultValue="1"
           error={errors[`qty_${i}`]}
-          onChange={(v) => { clearError(`qty_${i}`); updateLineItemValue(`qty_${i}`, v); }}
-          onBlur={(e) => validateNumber(`qty_${i}`, e.target.value as string, "Quantity")}
+          onChange={(v) => {
+            clearError(`qty_${i}`);
+            updateLineItemValue(`qty_${i}`, v);
+          }}
+          onBlur={(e) =>
+            validateNumber(`qty_${i}`, e.target.value as string, "Quantity")
+          }
         />,
         <Form.TextField
           key={`rate_${i}`}
@@ -392,8 +497,13 @@ export default function CreateInvoice() {
           title={`Rate (£) ${i + 1}`}
           placeholder="0.00"
           error={errors[`rate_${i}`]}
-          onChange={(v) => { clearError(`rate_${i}`); updateLineItemValue(`rate_${i}`, v); }}
-          onBlur={(e) => validateNumber(`rate_${i}`, e.target.value as string, "Rate", false)}
+          onChange={(v) => {
+            clearError(`rate_${i}`);
+            updateLineItemValue(`rate_${i}`, v);
+          }}
+          onBlur={(e) =>
+            validateNumber(`rate_${i}`, e.target.value as string, "Rate", false)
+          }
         />,
       ]).flat()}
 
@@ -401,7 +511,13 @@ export default function CreateInvoice() {
 
       <Form.Separator />
 
-      <Form.Checkbox id="vatApplied" label="Apply VAT" title="VAT" defaultValue={preferences.vatRegistered} onChange={setVatChecked} />
+      <Form.Checkbox
+        id="vatApplied"
+        label="Apply VAT"
+        title="VAT"
+        defaultValue={preferences.vatRegistered}
+        onChange={setVatChecked}
+      />
 
       {runningTotal.subtotal > 0 && (
         <Form.Description

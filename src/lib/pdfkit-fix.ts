@@ -10,14 +10,6 @@ import path from "path";
  * Must be called before creating any PDFDocument.
  */
 export function patchPDFKitFonts(): void {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const pdfkit = require("pdfkit");
-  const proto = pdfkit.default?.prototype ?? pdfkit.prototype;
-
-  // Access the STANDARD_FONTS object from the bundled pdfkit module
-  // We override the font method on the prototype to intercept font loading
-  const origFont = proto.font;
-
   // Create the data directory as a symlink to assets if it doesn't exist
   const extPath = environment.assetsPath.replace(/\/assets$/, "");
   const dataDir = path.join(extPath, "data");
@@ -32,7 +24,10 @@ export function patchPDFKitFonts(): void {
         const assetsDir = environment.assetsPath;
         for (const file of fs.readdirSync(assetsDir)) {
           if (file.endsWith(".afm")) {
-            fs.copyFileSync(path.join(assetsDir, file), path.join(dataDir, file));
+            fs.copyFileSync(
+              path.join(assetsDir, file),
+              path.join(dataDir, file),
+            );
           }
         }
       } catch {

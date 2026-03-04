@@ -50,7 +50,10 @@ export async function addInvoice(invoice: Invoice): Promise<void> {
   await saveInvoices(invoices);
 }
 
-export async function updateInvoiceStatus(id: string, status: InvoiceStatus): Promise<void> {
+export async function updateInvoiceStatus(
+  id: string,
+  status: InvoiceStatus,
+): Promise<void> {
   const invoices = await getInvoices();
   const index = invoices.findIndex((inv) => inv.id === id);
   if (index === -1) throw new Error(`Invoice not found: ${id}`);
@@ -77,7 +80,9 @@ export async function deleteInvoice(id: string): Promise<void> {
 
 // Invoice Counter
 
-export async function getNextInvoiceNumber(startingNumber: number): Promise<number> {
+export async function getNextInvoiceNumber(
+  startingNumber: number,
+): Promise<number> {
   const data = await LocalStorage.getItem<string>(STORAGE_KEYS.invoiceCounter);
   const counter: InvoiceCounter = data
     ? JSON.parse(data)
@@ -86,14 +91,16 @@ export async function getNextInvoiceNumber(startingNumber: number): Promise<numb
   // Save incremented counter BEFORE returning (prevents duplicates)
   await LocalStorage.setItem(
     STORAGE_KEYS.invoiceCounter,
-    JSON.stringify({ currentNumber: nextNumber })
+    JSON.stringify({ currentNumber: nextNumber }),
   );
   return nextNumber;
 }
 
 // Helpers
 
-export async function getInvoiceCountForClient(clientId: string): Promise<number> {
+export async function getInvoiceCountForClient(
+  clientId: string,
+): Promise<number> {
   const invoices = await getInvoices();
   return invoices.filter((inv) => inv.clientId === clientId).length;
 }

@@ -1,17 +1,17 @@
-# Fast Invoice
+# Easy Invoice
 
 A Raycast extension for generating professional PDF invoices locally. Built for UK freelancers and small businesses using GBP.
 
 ## Features
 
 - **Create Invoice** - Fill in a form, get a PDF. Invoices are numbered automatically and saved to a folder organised by year.
-- **List Invoices** - Browse, filter, and manage all your invoices. Mark them as draft, sent, or paid. Open PDFs, compose emails, or copy summaries.
+- **List Invoices** - Browse, filter, and manage all your invoices. Mark them as draft, sent, or paid. Open PDFs or copy summaries.
 - **Export Invoices** - Export filtered invoice data as CSV or a PDF summary report. Useful for tax returns and bookkeeping.
 - **Manage Clients** - Save client details (name, contact, email, address) so you can reuse them across invoices. New clients can also be added inline when creating an invoice.
 
 ## Setup
 
-After installing, open Raycast preferences for Fast Invoice and fill in:
+After installing, open Raycast preferences for Easy Invoice and fill in:
 
 - **Business details** - Name, address, email, phone
 - **Bank details** - Bank name, account name, sort code, account number (printed on invoices for payment)
@@ -30,7 +30,7 @@ After installing, open Raycast preferences for Fast Invoice and fill in:
 5. Toggle VAT if needed
 6. Submit to generate the PDF
 
-After creation you can open the PDF, reveal it in Finder, compose an email with the invoice details, or copy the file path.
+After creation you can open the PDF, reveal it in Finder, or copy the file path.
 
 ### Managing invoices
 
@@ -38,7 +38,6 @@ Use "List Invoices" to see all invoices. Filter by status (draft/sent/paid) or y
 
 - Open or reveal the PDF
 - Change the status
-- Compose an email to the client
 - View full details
 - Delete the invoice and its PDF
 
@@ -50,7 +49,6 @@ Use "List Invoices" to see all invoices. Filter by status (draft/sent/paid) or y
 | Cmd+Shift+L | Remove last line item |
 | Cmd+D | View invoice details |
 | Cmd+O | Open in Finder |
-| Cmd+E | Compose email |
 | Cmd+C | Copy file path |
 | Cmd+Shift+C | Copy invoice summary |
 | Cmd+S | Mark as sent |

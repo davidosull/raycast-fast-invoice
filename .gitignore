@@ -1,3 +1,4 @@
+.claude/
 node_modules/
 dist/
 data/
@@ -7,3 +8,4 @@ preview-invoice.pdf
 preview-pdf.ts
 CLAUDE.md
 raycast-invoice-generator-scope.md
+SUBMITTING.md

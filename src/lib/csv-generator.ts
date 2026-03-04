@@ -37,7 +37,7 @@ export function generateCSV(invoices: Invoice[]): string {
       inv.status.charAt(0).toUpperCase() + inv.status.slice(1),
       escapeCSV(inv.notes),
       escapeCSV(inv.pdfPath),
-    ].join(",")
+    ].join(","),
   );
 
   return [headers.join(","), ...rows].join("\n");

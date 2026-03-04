@@ -18,9 +18,20 @@ import { useCallback, useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import InvoiceDetail from "./components/InvoiceDetail";
 import { STATUS_COLORS, STATUS_LABELS } from "./lib/constants";
-import { formatCurrency, formatDate, formatInvoiceNumber, isOverdue, buildMailtoLink, buildInvoiceSummary } from "./lib/formatters";
+import {
+  formatCurrency,
+  formatInvoiceNumber,
+  isOverdue,
+  buildInvoiceSummary,
+} from "./lib/formatters";
 import { generateInvoicePDF } from "./lib/pdf-generator";
-import { addInvoice, deleteInvoice, getInvoices, getNextInvoiceNumber, updateInvoiceStatus } from "./lib/storage";
+import {
+  addInvoice,
+  deleteInvoice,
+  getInvoices,
+  getNextInvoiceNumber,
+  updateInvoiceStatus,
+} from "./lib/storage";
 import { Invoice, InvoiceStatus, Preferences } from "./lib/types";
 
 export default function ListInvoices() {
@@ -43,18 +54,26 @@ export default function ListInvoices() {
     loadInvoices();
   }, [loadInvoices]);
 
-  const years = [...new Set(invoices.map((inv) => inv.invoiceDate.substring(0, 4)))].sort().reverse();
+  const years = [
+    ...new Set(invoices.map((inv) => inv.invoiceDate.substring(0, 4))),
+  ]
+    .sort()
+    .reverse();
 
   const filtered = invoices.filter((inv) => {
     if (filter === "all") return true;
-    if (filter === "draft" || filter === "sent" || filter === "paid") return inv.status === filter;
+    if (filter === "draft" || filter === "sent" || filter === "paid")
+      return inv.status === filter;
     // Year filter
     return inv.invoiceDate.startsWith(filter);
   });
 
   async function handleStatusChange(invoice: Invoice, status: InvoiceStatus) {
     await updateInvoiceStatus(invoice.id, status);
-    await showToast({ style: Toast.Style.Success, title: `Marked as ${STATUS_LABELS[status]}` });
+    await showToast({
+      style: Toast.Style.Success,
+      title: `Marked as ${STATUS_LABELS[status]}`,
+    });
     await loadInvoices();
   }
 
@@ -62,11 +81,16 @@ export default function ListInvoices() {
     try {
       const startingNum = parseInt(preferences.startingInvoiceNumber) || 1;
       const numberRaw = await getNextInvoiceNumber(startingNum);
-      const invoiceNumber = formatInvoiceNumber(preferences.invoicePrefix, numberRaw);
+      const invoiceNumber = formatInvoiceNumber(
+        preferences.invoicePrefix,
+        numberRaw,
+      );
 
       const today = new Date();
       const dueDate = new Date(today);
-      dueDate.setDate(dueDate.getDate() + (parseInt(preferences.paymentTermsDays) || 30));
+      dueDate.setDate(
+        dueDate.getDate() + (parseInt(preferences.paymentTermsDays) || 30),
+      );
       const now = new Date().toISOString();
 
       const newInvoice: Invoice = {
@@ -85,10 +109,17 @@ export default function ListInvoices() {
       const pdfPath = await generateInvoicePDF(newInvoice, preferences);
       newInvoice.pdfPath = pdfPath;
       await addInvoice(newInvoice);
-      await showToast({ style: Toast.Style.Success, title: `Duplicated as ${invoiceNumber}` });
+      await showToast({
+        style: Toast.Style.Success,
+        title: `Duplicated as ${invoiceNumber}`,
+      });
       await loadInvoices();
     } catch (error) {
-      await showToast({ style: Toast.Style.Failure, title: "Failed to duplicate", message: String(error) });
+      await showToast({
+        style: Toast.Style.Failure,
+        title: "Failed to duplicate",
+        message: String(error),
+      });
     }
   }
 
@@ -97,7 +128,10 @@ export default function ListInvoices() {
       await confirmAlert({
         title: "Delete Invoice",
         message: `Delete ${invoice.invoiceNumber}? This will also delete the PDF file.`,
-        primaryAction: { title: "Delete", style: Alert.ActionStyle.Destructive },
+        primaryAction: {
+          title: "Delete",
+          style: Alert.ActionStyle.Destructive,
+        },
       })
     ) {
       await deleteInvoice(invoice.id);
@@ -129,7 +163,10 @@ export default function ListInvoices() {
       }
     >
       {filtered.length === 0 && !isLoading ? (
-        <List.EmptyView title="No Invoices" description="No invoices match the current filters." />
+        <List.EmptyView
+          title="No Invoices"
+          description="No invoices match the current filters."
+        />
       ) : (
         filtered.map((inv) => (
           <List.Item
@@ -141,12 +178,17 @@ export default function ListInvoices() {
               { date: new Date(inv.invoiceDate) },
               isOverdue(inv)
                 ? { tag: { value: "Overdue", color: Color.Red } }
-                : { tag: { value: STATUS_LABELS[inv.status], color: STATUS_COLORS[inv.status] } },
+                : {
+                    tag: {
+                      value: STATUS_LABELS[inv.status],
+                      color: STATUS_COLORS[inv.status],
+                    },
+                  },
             ]}
             actions={
               <ActionPanel>
                 <Action
-                  title="Open PDF"
+                  title="Open Pdf"
                   icon={Icon.Document}
                   onAction={() => open(inv.pdfPath)}
                 />
@@ -154,7 +196,14 @@ export default function ListInvoices() {
                   title="View Details"
                   icon={Icon.Eye}
                   shortcut={{ modifiers: ["cmd"], key: "return" }}
-                  onAction={() => push(<InvoiceDetail invoice={inv} onDuplicate={() => handleDuplicate(inv)} />)}
+                  onAction={() =>
+                    push(
+                      <InvoiceDetail
+                        invoice={inv}
+                        onDuplicate={() => handleDuplicate(inv)}
+                      />,
+                    )
+                  }
                 />
                 <Action
                   title="Open in Finder"
@@ -162,19 +211,16 @@ export default function ListInvoices() {
                   shortcut={{ modifiers: ["cmd"], key: "o" }}
                   onAction={() => showInFinder(inv.pdfPath)}
                 />
-                <Action.OpenInBrowser
-                  title="Compose Email"
-                  icon={Icon.Envelope}
-                  shortcut={{ modifiers: ["cmd"], key: "e" }}
-                  url={buildMailtoLink(inv, preferences)}
-                />
                 <Action
                   title="Copy File Path"
                   icon={Icon.Clipboard}
                   shortcut={{ modifiers: ["cmd"], key: "c" }}
                   onAction={async () => {
                     await Clipboard.copy(inv.pdfPath);
-                    await showToast({ style: Toast.Style.Success, title: "Path copied" });
+                    await showToast({
+                      style: Toast.Style.Success,
+                      title: "Path copied",
+                    });
                   }}
                 />
                 <ActionPanel.Section title="Status">
@@ -215,7 +261,10 @@ export default function ListInvoices() {
                     shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
                     onAction={async () => {
                       await Clipboard.copy(buildInvoiceSummary(inv));
-                      await showToast({ style: Toast.Style.Success, title: "Summary copied" });
+                      await showToast({
+                        style: Toast.Style.Success,
+                        title: "Summary copied",
+                      });
                     }}
                   />
                   <Action

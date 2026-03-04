@@ -1,38 +1,41 @@
 {
   "$schema": "https://www.raycast.com/schemas/extension.json",
-  "name": "invoice-generator",
-  "title": "Fast Invoice",
+  "name": "easy-invoice",
+  "title": "Easy Invoice",
   "description": "Create and manage professional PDF invoices in seconds. Track clients, export records, and get paid faster.",
   "icon": "command-icon.png",
-  "author": "davidobuilds",
-  "categories": ["Finance", "Productivity"],
+  "author": "davidosull",
+  "categories": [
+    "Finance",
+    "Productivity"
+  ],
   "license": "MIT",
   "commands": [
     {
       "name": "create-invoice",
       "title": "Create Invoice",
-      "subtitle": "Invoice Generator",
+      "subtitle": "Easy Invoice",
       "description": "Create and generate a new PDF invoice",
       "mode": "view"
     },
     {
       "name": "list-invoices",
       "title": "List Invoices",
-      "subtitle": "Invoice Generator",
+      "subtitle": "Easy Invoice",
       "description": "Browse and manage issued invoices",
       "mode": "view"
     },
     {
       "name": "export-invoices",
       "title": "Export Invoices",
-      "subtitle": "Invoice Generator",
+      "subtitle": "Easy Invoice",
       "description": "Export invoice history as CSV or PDF summary",
       "mode": "view"
     },
     {
       "name": "manage-clients",
       "title": "Manage Clients",
-      "subtitle": "Invoice Generator",
+      "subtitle": "Easy Invoice",
       "description": "Add, edit, and remove saved clients",
       "mode": "view"
     }

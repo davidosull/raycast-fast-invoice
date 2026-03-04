@@ -5,7 +5,10 @@ export function calculateLineTotal(quantity: number, rate: number): number {
 }
 
 export function calculateSubtotal(lineItems: InvoiceLineItem[]): number {
-  return Math.round(lineItems.reduce((sum, item) => sum + item.lineTotal, 0) * 100) / 100;
+  return (
+    Math.round(lineItems.reduce((sum, item) => sum + item.lineTotal, 0) * 100) /
+    100
+  );
 }
 
 export function calculateVat(subtotal: number, vatRate: number): number {
@@ -19,7 +22,7 @@ export function calculateTotal(subtotal: number, vatAmount: number): number {
 export function calculateInvoiceTotals(
   lineItems: InvoiceLineItem[],
   vatApplied: boolean,
-  vatRate: number
+  vatRate: number,
 ): { subtotal: number; vatAmount: number; total: number } {
   const subtotal = calculateSubtotal(lineItems);
   const vatAmount = vatApplied ? calculateVat(subtotal, vatRate) : 0;

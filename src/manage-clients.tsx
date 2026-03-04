@@ -11,12 +11,18 @@ import {
 } from "@raycast/api";
 import { useCallback, useEffect, useState } from "react";
 import ClientForm from "./components/ClientForm";
-import { deleteClient, getClients, getInvoiceCountForClient } from "./lib/storage";
+import {
+  deleteClient,
+  getClients,
+  getInvoiceCountForClient,
+} from "./lib/storage";
 import { Client } from "./lib/types";
 
 export default function ManageClients() {
   const [clients, setClients] = useState<Client[]>([]);
-  const [invoiceCounts, setInvoiceCounts] = useState<Record<string, number>>({});
+  const [invoiceCounts, setInvoiceCounts] = useState<Record<string, number>>(
+    {},
+  );
   const [isLoading, setIsLoading] = useState(true);
   const { push } = useNavigation();
 
@@ -52,7 +58,10 @@ export default function ManageClients() {
       await confirmAlert({
         title: "Delete Client",
         message: `Are you sure you want to delete "${client.name}"?`,
-        primaryAction: { title: "Delete", style: Alert.ActionStyle.Destructive },
+        primaryAction: {
+          title: "Delete",
+          style: Alert.ActionStyle.Destructive,
+        },
       })
     ) {
       await deleteClient(client.id);
@@ -82,10 +91,8 @@ export default function ManageClients() {
           <List.Item
             key={client.id}
             title={client.name}
-            subtitle={client.contactName || client.email}
+            subtitle={client.email}
             accessories={[
-              ...(client.contactName ? [{ text: client.email }] : []),
-              ...(client.address ? [{ text: client.address.split(",")[0].trim() }] : []),
               {
                 text: `${invoiceCounts[client.id] ?? 0} invoice${(invoiceCounts[client.id] ?? 0) === 1 ? "" : "s"}`,
               },
@@ -95,7 +102,9 @@ export default function ManageClients() {
                 <Action
                   title="Edit Client"
                   icon={Icon.Pencil}
-                  onAction={() => push(<ClientForm client={client} onSaved={loadClients} />)}
+                  onAction={() =>
+                    push(<ClientForm client={client} onSaved={loadClients} />)
+                  }
                 />
                 <Action
                   title="Add Client"
