@@ -52,7 +52,7 @@ export async function generateInvoicePDF(
     const stream = fs.createWriteStream(filePath);
     doc.pipe(stream);
 
-    let y = M;
+    let y: number = M;
 
     // Invoice title + number (top right)
     doc.font("Helvetica-Bold").fontSize(9).fillColor(BLACK);
