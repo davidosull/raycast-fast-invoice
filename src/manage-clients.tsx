@@ -1,28 +1,12 @@
-import {
-  Action,
-  ActionPanel,
-  Alert,
-  confirmAlert,
-  Icon,
-  List,
-  showToast,
-  Toast,
-  useNavigation,
-} from "@raycast/api";
+import { Action, ActionPanel, Alert, confirmAlert, Icon, List, showToast, Toast, useNavigation } from "@raycast/api";
 import { useCallback, useEffect, useState } from "react";
 import ClientForm from "./components/ClientForm";
-import {
-  deleteClient,
-  getClients,
-  getInvoiceCountForClient,
-} from "./lib/storage";
+import { deleteClient, getClients, getInvoiceCountForClient } from "./lib/storage";
 import { Client } from "./lib/types";
 
 export default function ManageClients() {
   const [clients, setClients] = useState<Client[]>([]);
-  const [invoiceCounts, setInvoiceCounts] = useState<Record<string, number>>(
-    {},
-  );
+  const [invoiceCounts, setInvoiceCounts] = useState<Record<string, number>>({});
   const [isLoading, setIsLoading] = useState(true);
   const { push } = useNavigation();
 
@@ -78,11 +62,7 @@ export default function ManageClients() {
           description="Add your first client to get started."
           actions={
             <ActionPanel>
-              <Action
-                title="Add Client"
-                icon={Icon.Plus}
-                onAction={() => push(<ClientForm onSaved={loadClients} />)}
-              />
+              <Action title="Add Client" icon={Icon.Plus} onAction={() => push(<ClientForm onSaved={loadClients} />)} />
             </ActionPanel>
           }
         />
@@ -102,9 +82,7 @@ export default function ManageClients() {
                 <Action
                   title="Edit Client"
                   icon={Icon.Pencil}
-                  onAction={() =>
-                    push(<ClientForm client={client} onSaved={loadClients} />)
-                  }
+                  onAction={() => push(<ClientForm client={client} onSaved={loadClients} />)}
                 />
                 <Action
                   title="Add Client"

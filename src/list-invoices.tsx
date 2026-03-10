@@ -18,20 +18,9 @@ import { useCallback, useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import InvoiceDetail from "./components/InvoiceDetail";
 import { STATUS_COLORS, STATUS_LABELS } from "./lib/constants";
-import {
-  formatCurrency,
-  formatInvoiceNumber,
-  isOverdue,
-  buildInvoiceSummary,
-} from "./lib/formatters";
+import { formatCurrency, formatInvoiceNumber, isOverdue, buildInvoiceSummary } from "./lib/formatters";
 import { generateInvoicePDF } from "./lib/pdf-generator";
-import {
-  addInvoice,
-  deleteInvoice,
-  getInvoices,
-  getNextInvoiceNumber,
-  updateInvoiceStatus,
-} from "./lib/storage";
+import { addInvoice, deleteInvoice, getInvoices, getNextInvoiceNumber, updateInvoiceStatus } from "./lib/storage";
 import { Invoice, InvoiceStatus } from "./lib/types";
 
 export default function ListInvoices() {
@@ -54,16 +43,11 @@ export default function ListInvoices() {
     loadInvoices();
   }, [loadInvoices]);
 
-  const years = [
-    ...new Set(invoices.map((inv) => inv.invoiceDate.substring(0, 4))),
-  ]
-    .sort()
-    .reverse();
+  const years = [...new Set(invoices.map((inv) => inv.invoiceDate.substring(0, 4)))].sort().reverse();
 
   const filtered = invoices.filter((inv) => {
     if (filter === "all") return true;
-    if (filter === "draft" || filter === "sent" || filter === "paid")
-      return inv.status === filter;
+    if (filter === "draft" || filter === "sent" || filter === "paid") return inv.status === filter;
     // Year filter
     return inv.invoiceDate.startsWith(filter);
   });
@@ -81,16 +65,11 @@ export default function ListInvoices() {
     try {
       const startingNum = parseInt(preferences.startingInvoiceNumber) || 1;
       const numberRaw = await getNextInvoiceNumber(startingNum);
-      const invoiceNumber = formatInvoiceNumber(
-        preferences.invoicePrefix,
-        numberRaw,
-      );
+      const invoiceNumber = formatInvoiceNumber(preferences.invoicePrefix, numberRaw);
 
       const today = new Date();
       const dueDate = new Date(today);
-      dueDate.setDate(
-        dueDate.getDate() + (parseInt(preferences.paymentTermsDays) || 30),
-      );
+      dueDate.setDate(dueDate.getDate() + (parseInt(preferences.paymentTermsDays) || 30));
       const now = new Date().toISOString();
 
       const newInvoice: Invoice = {
@@ -163,10 +142,7 @@ export default function ListInvoices() {
       }
     >
       {filtered.length === 0 && !isLoading ? (
-        <List.EmptyView
-          title="No Invoices"
-          description="No invoices match the current filters."
-        />
+        <List.EmptyView title="No Invoices" description="No invoices match the current filters." />
       ) : (
         filtered.map((inv) => (
           <List.Item
@@ -187,23 +163,12 @@ export default function ListInvoices() {
             ]}
             actions={
               <ActionPanel>
-                <Action
-                  title="Open Pdf"
-                  icon={Icon.Document}
-                  onAction={() => open(inv.pdfPath)}
-                />
+                <Action title="Open Pdf" icon={Icon.Document} onAction={() => open(inv.pdfPath)} />
                 <Action
                   title="View Details"
                   icon={Icon.Eye}
                   shortcut={{ modifiers: ["cmd"], key: "return" }}
-                  onAction={() =>
-                    push(
-                      <InvoiceDetail
-                        invoice={inv}
-                        onDuplicate={() => handleDuplicate(inv)}
-                      />,
-                    )
-                  }
+                  onAction={() => push(<InvoiceDetail invoice={inv} onDuplicate={() => handleDuplicate(inv)} />)}
                 />
                 <Action
                   title="Open in Finder"

@@ -1,19 +1,5 @@
-import {
-  Action,
-  ActionPanel,
-  Clipboard,
-  Detail,
-  Icon,
-  open,
-  showInFinder,
-  showToast,
-  Toast,
-} from "@raycast/api";
-import {
-  formatCurrency,
-  formatDate,
-  buildInvoiceSummary,
-} from "../lib/formatters";
+import { Action, ActionPanel, Clipboard, Detail, Icon, open, showInFinder, showToast, Toast } from "@raycast/api";
+import { formatCurrency, formatDate, buildInvoiceSummary } from "../lib/formatters";
 import { STATUS_LABELS } from "../lib/constants";
 import { Invoice } from "../lib/types";
 
@@ -22,10 +8,7 @@ interface InvoiceDetailProps {
   onDuplicate?: () => void;
 }
 
-export default function InvoiceDetail({
-  invoice,
-  onDuplicate,
-}: InvoiceDetailProps) {
+export default function InvoiceDetail({ invoice, onDuplicate }: InvoiceDetailProps) {
   const lineItemsTable = invoice.lineItems
     .map(
       (item) =>
@@ -72,11 +55,7 @@ ${invoice.notes ? `---\n\n## Notes\n${invoice.notes}` : ""}
       navigationTitle={invoice.invoiceNumber}
       actions={
         <ActionPanel>
-          <Action
-            title="Open Pdf"
-            icon={Icon.Document}
-            onAction={() => open(invoice.pdfPath)}
-          />
+          <Action title="Open Pdf" icon={Icon.Document} onAction={() => open(invoice.pdfPath)} />
           <Action
             title="Open in Finder"
             icon={Icon.Finder}

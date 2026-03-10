@@ -33,10 +33,7 @@ export async function generatePDFSummary(
     let y = 50;
 
     // Header
-    doc
-      .font("Helvetica-Bold")
-      .fontSize(18)
-      .text(`Invoice Summary - ${preferences.businessName}`, 50, y);
+    doc.font("Helvetica-Bold").fontSize(18).text(`Invoice Summary - ${preferences.businessName}`, 50, y);
     y += 26;
     doc
       .font("Helvetica")
@@ -66,11 +63,7 @@ export async function generatePDFSummary(
     const sentCount = invoices.filter((i) => i.status === "sent").length;
     const paidCount = invoices.filter((i) => i.status === "paid").length;
 
-    doc
-      .font("Helvetica-Bold")
-      .fontSize(12)
-      .fillColor("#000000")
-      .text("Summary", 50, y);
+    doc.font("Helvetica-Bold").fontSize(12).fillColor("#000000").text("Summary", 50, y);
     y += 18;
 
     doc.font("Helvetica").fontSize(10);
@@ -80,11 +73,7 @@ export async function generatePDFSummary(
     y += 14;
     doc.text(`Number of Invoices: ${invoices.length}`, 50, y);
     y += 14;
-    doc.text(
-      `Draft: ${draftCount} | Sent: ${sentCount} | Paid: ${paidCount}`,
-      50,
-      y,
-    );
+    doc.text(`Draft: ${draftCount} | Sent: ${sentCount} | Paid: ${paidCount}`, 50, y);
     y += 25;
 
     // Separator
@@ -156,12 +145,7 @@ export async function generatePDFSummary(
         width: colW.total,
         align: "right",
       });
-      doc.text(
-        inv.status.charAt(0).toUpperCase() + inv.status.slice(1),
-        colX.status,
-        y + 4,
-        { width: colW.status },
-      );
+      doc.text(inv.status.charAt(0).toUpperCase() + inv.status.slice(1), colX.status, y + 4, { width: colW.status });
 
       y += 18;
       doc

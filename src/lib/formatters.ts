@@ -4,11 +4,23 @@ import path from "path";
 import { Invoice } from "./types";
 
 export function formatCurrency(amount: number): string {
-  const { currencyCode } = getPreferenceValues<{ currencyCode?: string }>();
+  const preferences = getPreferenceValues<Preferences>();
   return new Intl.NumberFormat(undefined, {
     style: "currency",
-    currency: currencyCode || "GBP",
+    currency: preferences.currencyCode || "GBP",
   }).format(amount);
+}
+
+export function getCurrencySymbol(): string {
+  const preferences = getPreferenceValues<Preferences>();
+  return (
+    new Intl.NumberFormat(undefined, {
+      style: "currency",
+      currency: preferences.currencyCode || "GBP",
+    })
+      .formatToParts(0)
+      .find((p) => p.type === "currency")?.value ?? "£"
+  );
 }
 
 export function formatDate(isoDate: string): string {
@@ -62,15 +74,11 @@ export function buildInvoiceSummary(invoice: Invoice): string {
   ];
 
   if (invoice.vatApplied) {
-    lines.push(
-      `VAT (${invoice.vatRate}%): ${formatCurrency(invoice.vatAmount)}`,
-    );
+    lines.push(`VAT (${invoice.vatRate}%): ${formatCurrency(invoice.vatAmount)}`);
   }
 
   lines.push(`Total: ${formatCurrency(invoice.total)}`);
-  lines.push(
-    `Status: ${invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}`,
-  );
+  lines.push(`Status: ${invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}`);
 
   return lines.join("\n");
 }

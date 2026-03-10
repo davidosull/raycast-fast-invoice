@@ -2,12 +2,7 @@ import fs from "fs";
 import path from "path";
 import PDFDocument from "pdfkit";
 import { PDF } from "./constants";
-import {
-  formatCurrency,
-  formatDate,
-  parseAddress,
-  resolveSaveLocation,
-} from "./formatters";
+import { formatCurrency, formatDate, parseAddress, resolveSaveLocation } from "./formatters";
 import { patchPDFKitFonts } from "./pdfkit-fix";
 import { Invoice } from "./types";
 
@@ -32,10 +27,7 @@ const COL_QTY_X = COL_RATE_X - COL_QTY_W;
 const COL_DESC_X = M;
 const COL_DESC_W = COL_QTY_X - COL_DESC_X - 8;
 
-export async function generateInvoicePDF(
-  invoice: Invoice,
-  preferences: Preferences,
-): Promise<string> {
+export async function generateInvoicePDF(invoice: Invoice, preferences: Preferences): Promise<string> {
   const saveBase = resolveSaveLocation(preferences.saveLocation);
   const year = new Date(invoice.invoiceDate).getFullYear().toString();
   const dir = path.join(saveBase, year);
@@ -62,21 +54,12 @@ export async function generateInvoicePDF(
     doc.text(invoice.invoiceNumber, M, y, { width: CW, align: "right" });
 
     // Business name (top left, same baseline as INVOICE)
-    doc
-      .font("Helvetica-Bold")
-      .fontSize(9)
-      .fillColor(BLACK)
-      .text(preferences.businessName, M, M);
+    doc.font("Helvetica-Bold").fontSize(9).fillColor(BLACK).text(preferences.businessName, M, M);
 
     y += 24;
 
     // Divider
-    doc
-      .moveTo(M, y)
-      .lineTo(TABLE_RIGHT, y)
-      .lineWidth(0.5)
-      .strokeColor(LIGHT_GREY)
-      .stroke();
+    doc.moveTo(M, y).lineTo(TABLE_RIGHT, y).lineWidth(0.5).strokeColor(LIGHT_GREY).stroke();
     y += 20;
 
     // Two-column: From / To
@@ -84,18 +67,10 @@ export async function generateInvoicePDF(
     const colRight = M + CW / 2 + 20;
 
     // From label
-    doc
-      .font("Helvetica")
-      .fontSize(7)
-      .fillColor(MID_GREY)
-      .text("From", colLeft, y);
+    doc.font("Helvetica").fontSize(7).fillColor(MID_GREY).text("From", colLeft, y);
     y += 12;
     const fromStartY = y;
-    doc
-      .font("Helvetica-Bold")
-      .fontSize(8.5)
-      .fillColor(BLACK)
-      .text(preferences.yourName, colLeft, y);
+    doc.font("Helvetica-Bold").fontSize(8.5).fillColor(BLACK).text(preferences.yourName, colLeft, y);
     y += 12;
     doc.font("Helvetica").fontSize(8.5).fillColor(BLACK);
     for (const line of parseAddress(preferences.businessAddress)) {
@@ -113,17 +88,9 @@ export async function generateInvoicePDF(
 
     // To (right column, same start Y)
     let ry = fromStartY - 12;
-    doc
-      .font("Helvetica")
-      .fontSize(7)
-      .fillColor(MID_GREY)
-      .text("To", colRight, ry);
+    doc.font("Helvetica").fontSize(7).fillColor(MID_GREY).text("To", colRight, ry);
     ry += 12;
-    doc
-      .font("Helvetica-Bold")
-      .fontSize(8.5)
-      .fillColor(BLACK)
-      .text(invoice.clientName, colRight, ry);
+    doc.font("Helvetica-Bold").fontSize(8.5).fillColor(BLACK).text(invoice.clientName, colRight, ry);
     ry += 12;
     if (invoice.clientAddress) {
       doc.font("Helvetica").fontSize(8.5).fillColor(BLACK);
@@ -136,38 +103,21 @@ export async function generateInvoicePDF(
         ry += 12;
       }
     }
-    doc
-      .font("Helvetica")
-      .fontSize(8.5)
-      .fillColor(BLACK)
-      .text(invoice.clientEmail, colRight, ry);
+    doc.font("Helvetica").fontSize(8.5).fillColor(BLACK).text(invoice.clientEmail, colRight, ry);
     ry += 12;
 
     y = Math.max(y, ry) + 8;
 
     // Date / Due row
-    doc
-      .font("Helvetica")
-      .fontSize(7)
-      .fillColor(MID_GREY)
-      .text("Date", colLeft, y);
+    doc.font("Helvetica").fontSize(7).fillColor(MID_GREY).text("Date", colLeft, y);
     doc.text("Due", colRight, y);
     y += 12;
-    doc
-      .font("Helvetica")
-      .fontSize(8.5)
-      .fillColor(BLACK)
-      .text(formatDate(invoice.invoiceDate), colLeft, y);
+    doc.font("Helvetica").fontSize(8.5).fillColor(BLACK).text(formatDate(invoice.invoiceDate), colLeft, y);
     doc.text(formatDate(invoice.dueDate), colRight, y);
     y += 20;
 
     // Divider
-    doc
-      .moveTo(M, y)
-      .lineTo(TABLE_RIGHT, y)
-      .lineWidth(0.5)
-      .strokeColor(LIGHT_GREY)
-      .stroke();
+    doc.moveTo(M, y).lineTo(TABLE_RIGHT, y).lineWidth(0.5).strokeColor(LIGHT_GREY).stroke();
     y += 16;
 
     // Line items table header
@@ -180,12 +130,7 @@ export async function generateInvoicePDF(
       align: "right",
     });
     y += 14;
-    doc
-      .moveTo(M, y)
-      .lineTo(TABLE_RIGHT, y)
-      .lineWidth(0.5)
-      .strokeColor(LIGHT_GREY)
-      .stroke();
+    doc.moveTo(M, y).lineTo(TABLE_RIGHT, y).lineWidth(0.5).strokeColor(LIGHT_GREY).stroke();
     y += 2;
 
     // Table rows
@@ -202,9 +147,7 @@ export async function generateInvoicePDF(
 
       const ty = y + 5;
       doc.text(item.description, COL_DESC_X, ty, { width: COL_DESC_W });
-      const qtyStr = Number.isInteger(item.quantity)
-        ? String(item.quantity)
-        : item.quantity.toFixed(2);
+      const qtyStr = Number.isInteger(item.quantity) ? String(item.quantity) : item.quantity.toFixed(2);
       doc.text(qtyStr, COL_QTY_X, ty, { width: COL_QTY_W, align: "right" });
       doc.text(formatCurrency(item.rate), COL_RATE_X, ty, {
         width: COL_RATE_W,
@@ -215,12 +158,7 @@ export async function generateInvoicePDF(
         align: "right",
       });
       y += rowH;
-      doc
-        .moveTo(M, y)
-        .lineTo(TABLE_RIGHT, y)
-        .lineWidth(0.5)
-        .strokeColor(LIGHT_GREY)
-        .stroke();
+      doc.moveTo(M, y).lineTo(TABLE_RIGHT, y).lineWidth(0.5).strokeColor(LIGHT_GREY).stroke();
       y += 2;
     }
 
@@ -247,12 +185,7 @@ export async function generateInvoicePDF(
     }
 
     y += 2;
-    doc
-      .moveTo(COL_RATE_X, y)
-      .lineTo(TABLE_RIGHT, y)
-      .lineWidth(0.5)
-      .strokeColor(LIGHT_GREY)
-      .stroke();
+    doc.moveTo(COL_RATE_X, y).lineTo(TABLE_RIGHT, y).lineWidth(0.5).strokeColor(LIGHT_GREY).stroke();
     y += 8;
     doc.font("Helvetica-Bold").fontSize(9);
     doc.text("Total", COL_RATE_X, y, { width: COL_RATE_W, align: "right" });
@@ -274,11 +207,7 @@ export async function generateInvoicePDF(
     // Payment details
     y += 24;
     y = checkPageBreak(doc, y, 60);
-    doc
-      .font("Helvetica")
-      .fontSize(7)
-      .fillColor(MID_GREY)
-      .text("Payment Details", M, y);
+    doc.font("Helvetica").fontSize(7).fillColor(MID_GREY).text("Payment Details", M, y);
     y += 12;
     doc.font("Helvetica").fontSize(8.5).fillColor(BLACK);
     doc.text(
@@ -289,13 +218,8 @@ export async function generateInvoicePDF(
     );
     y += 14;
     const terms =
-      preferences.paymentTermsText ||
-      `Payment due within ${preferences.paymentTermsDays} days of invoice date`;
-    doc
-      .font("Helvetica")
-      .fontSize(8)
-      .fillColor(MID_GREY)
-      .text(terms, M, y, { width: CW });
+      preferences.paymentTermsText || `Payment due within ${preferences.paymentTermsDays} days of invoice date`;
+    doc.font("Helvetica").fontSize(8).fillColor(MID_GREY).text(terms, M, y, { width: CW });
     y += 12;
 
     // Notes
@@ -304,23 +228,15 @@ export async function generateInvoicePDF(
       y = checkPageBreak(doc, y, 40);
       doc.font("Helvetica").fontSize(7).fillColor(MID_GREY).text("Notes", M, y);
       y += 12;
-      doc
-        .font("Helvetica")
-        .fontSize(8.5)
-        .fillColor(BLACK)
-        .text(invoice.notes, M, y, { width: CW });
+      doc.font("Helvetica").fontSize(8.5).fillColor(BLACK).text(invoice.notes, M, y, { width: CW });
     }
 
     // Footer
     const footerY = PDF.HEIGHT - M - 10;
-    doc
-      .font("Helvetica")
-      .fontSize(7)
-      .fillColor(MID_GREY)
-      .text(preferences.businessName, M, footerY, {
-        width: CW,
-        align: "center",
-      });
+    doc.font("Helvetica").fontSize(7).fillColor(MID_GREY).text(preferences.businessName, M, footerY, {
+      width: CW,
+      align: "center",
+    });
 
     doc.end();
 
@@ -329,11 +245,7 @@ export async function generateInvoicePDF(
   });
 }
 
-function checkPageBreak(
-  doc: PDFKit.PDFDocument,
-  y: number,
-  requiredSpace: number,
-): number {
+function checkPageBreak(doc: PDFKit.PDFDocument, y: number, requiredSpace: number): number {
   if (y + requiredSpace > PDF.HEIGHT - M - 20) {
     doc.addPage();
     return M;

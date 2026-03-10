@@ -24,10 +24,7 @@ export function patchPDFKitFonts(): void {
         const assetsDir = environment.assetsPath;
         for (const file of fs.readdirSync(assetsDir)) {
           if (file.endsWith(".afm")) {
-            fs.copyFileSync(
-              path.join(assetsDir, file),
-              path.join(dataDir, file),
-            );
+            fs.copyFileSync(path.join(assetsDir, file), path.join(dataDir, file));
           }
         }
       } catch {

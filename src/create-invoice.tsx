@@ -14,18 +14,9 @@ import {
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { calculateInvoiceTotals, calculateLineTotal } from "./lib/calculations";
-import {
-  formatCurrency,
-  formatInvoiceNumber,
-  buildInvoiceSummary,
-} from "./lib/formatters";
+import { formatCurrency, formatInvoiceNumber, buildInvoiceSummary, getCurrencySymbol } from "./lib/formatters";
 import { generateInvoicePDF } from "./lib/pdf-generator";
-import {
-  addClient,
-  addInvoice,
-  getClients,
-  getNextInvoiceNumber,
-} from "./lib/storage";
+import { addClient, addInvoice, getClients, getNextInvoiceNumber } from "./lib/storage";
 import { Client, Invoice, InvoiceLineItem } from "./lib/types";
 
 const NEW_CLIENT_ID = "__new__";
@@ -37,9 +28,7 @@ export default function CreateInvoice() {
   const [lineItemCount, setLineItemCount] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [successInvoice, setSuccessInvoice] = useState<Invoice | null>(null);
-  const [lineItemValues, setLineItemValues] = useState<Record<string, string>>(
-    {},
-  );
+  const [lineItemValues, setLineItemValues] = useState<Record<string, string>>({});
   const [vatChecked, setVatChecked] = useState(preferences.vatRegistered);
 
   const paymentDays = parseInt(preferences.paymentTermsDays) || 30;
@@ -73,11 +62,7 @@ export default function CreateInvoice() {
     });
   }
 
-  function validateRequired(
-    field: string,
-    value: string | undefined,
-    label: string,
-  ): boolean {
+  function validateRequired(field: string, value: string | undefined, label: string): boolean {
     if (!(value || "").trim()) {
       setError(field, `${label} is required`);
       return false;
@@ -86,12 +71,7 @@ export default function CreateInvoice() {
     return true;
   }
 
-  function validateNumber(
-    field: string,
-    value: string | undefined,
-    label: string,
-    allowZero = true,
-  ): boolean {
+  function validateNumber(field: string, value: string | undefined, label: string, allowZero = true): boolean {
     const trimmed = (value || "").trim();
     if (!trimmed) {
       setError(field, `${label} is required`);
@@ -138,16 +118,8 @@ export default function CreateInvoice() {
         markdown={`# Invoice Created\n\n${buildInvoiceSummary(successInvoice)}\n\n**PDF saved to:** \`${successInvoice.pdfPath}\``}
         actions={
           <ActionPanel>
-            <Action
-              title="Open Pdf"
-              icon={Icon.Document}
-              onAction={() => open(successInvoice.pdfPath)}
-            />
-            <Action
-              title="Open in Finder"
-              icon={Icon.Finder}
-              onAction={() => showInFinder(successInvoice.pdfPath)}
-            />
+            <Action title="Open Pdf" icon={Icon.Document} onAction={() => open(successInvoice.pdfPath)} />
+            <Action title="Open in Finder" icon={Icon.Finder} onAction={() => showInFinder(successInvoice.pdfPath)} />
             <Action
               title="Copy File Path"
               icon={Icon.Clipboard}
@@ -188,9 +160,7 @@ export default function CreateInvoice() {
 
     if (clientId === NEW_CLIENT_ID) {
       const newName = ((values.newClientName as string) || "").trim();
-      const newContactName = (
-        (values.newClientContactName as string) || ""
-      ).trim();
+      const newContactName = ((values.newClientContactName as string) || "").trim();
       const newEmail = ((values.newClientEmail as string) || "").trim();
       const newAddress = ((values.newClientAddress as string) || "").trim();
 
@@ -297,20 +267,13 @@ export default function CreateInvoice() {
     // Calculate totals
     const vatApplied = values.vatApplied as boolean;
     const vatRate = parseFloat(preferences.vatRate) || 0;
-    const { subtotal, vatAmount, total } = calculateInvoiceTotals(
-      lineItems,
-      vatApplied,
-      vatRate,
-    );
+    const { subtotal, vatAmount, total } = calculateInvoiceTotals(lineItems, vatApplied, vatRate);
 
     // Generate invoice
     try {
       const startingNum = parseInt(preferences.startingInvoiceNumber) || 1;
       const numberRaw = await getNextInvoiceNumber(startingNum);
-      const invoiceNumber = formatInvoiceNumber(
-        preferences.invoicePrefix,
-        numberRaw,
-      );
+      const invoiceNumber = formatInvoiceNumber(preferences.invoicePrefix, numberRaw);
 
       const now = new Date().toISOString();
       const invoice: Invoice = {
@@ -369,11 +332,7 @@ export default function CreateInvoice() {
       navigationTitle="Create Invoice"
       actions={
         <ActionPanel>
-          <Action.SubmitForm
-            title="Create Invoice"
-            icon={Icon.Document}
-            onSubmit={handleSubmit}
-          />
+          <Action.SubmitForm title="Create Invoice" icon={Icon.Document} onSubmit={handleSubmit} />
           <Action
             title="Add Line Item"
             icon={Icon.Plus}
@@ -391,18 +350,9 @@ export default function CreateInvoice() {
         </ActionPanel>
       }
     >
-      <Form.Dropdown
-        id="clientId"
-        title="Client"
-        value={selectedClientId}
-        onChange={setSelectedClientId}
-      >
+      <Form.Dropdown id="clientId" title="Client" value={selectedClientId} onChange={setSelectedClientId}>
         <Form.Dropdown.Item value="" title="Select a client..." />
-        <Form.Dropdown.Item
-          value={NEW_CLIENT_ID}
-          title="Add new"
-          icon={Icon.Plus}
-        />
+        <Form.Dropdown.Item value={NEW_CLIENT_ID} title="Add new" icon={Icon.Plus} />
         {clients.map((c) => (
           <Form.Dropdown.Item key={c.id} value={c.id} title={c.name} />
         ))}
@@ -416,19 +366,9 @@ export default function CreateInvoice() {
             placeholder="Company or trading name"
             error={errors.newClientName}
             onChange={() => clearError("newClientName")}
-            onBlur={(e) =>
-              validateRequired(
-                "newClientName",
-                e.target.value as string,
-                "Company name",
-              )
-            }
+            onBlur={(e) => validateRequired("newClientName", e.target.value as string, "Company name")}
           />
-          <Form.TextField
-            id="newClientContactName"
-            title="Contact Name"
-            placeholder="First name or full name"
-          />
+          <Form.TextField id="newClientContactName" title="Contact Name" placeholder="First name or full name" />
           <Form.TextField
             id="newClientEmail"
             title="Email"
@@ -436,11 +376,7 @@ export default function CreateInvoice() {
             error={errors.newClientEmail}
             onChange={() => clearError("newClientEmail")}
           />
-          <Form.TextArea
-            id="newClientAddress"
-            title="Address"
-            placeholder="Street, City, Postcode"
-          />
+          <Form.TextArea id="newClientAddress" title="Address" placeholder="Street, City, Postcode" />
         </>
       )}
 
@@ -466,11 +402,7 @@ export default function CreateInvoice() {
       <Form.Separator />
 
       {Array.from({ length: lineItemCount }, (_, i) => [
-        <Form.Description
-          key={`header_${i}`}
-          title=""
-          text={`- Line Item ${i + 1} -`}
-        />,
+        <Form.Description key={`header_${i}`} title="" text={`- Line Item ${i + 1} -`} />,
         <Form.TextArea
           key={`desc_${i}`}
           id={`desc_${i}`}
@@ -478,13 +410,7 @@ export default function CreateInvoice() {
           placeholder="Service description"
           error={errors[`desc_${i}`]}
           onChange={() => clearError(`desc_${i}`)}
-          onBlur={(e) =>
-            validateRequired(
-              `desc_${i}`,
-              e.target.value as string,
-              "Description",
-            )
-          }
+          onBlur={(e) => validateRequired(`desc_${i}`, e.target.value as string, "Description")}
         />,
         <Form.TextField
           key={`qty_${i}`}
@@ -497,23 +423,19 @@ export default function CreateInvoice() {
             clearError(`qty_${i}`);
             updateLineItemValue(`qty_${i}`, v);
           }}
-          onBlur={(e) =>
-            validateNumber(`qty_${i}`, e.target.value as string, "Quantity")
-          }
+          onBlur={(e) => validateNumber(`qty_${i}`, e.target.value as string, "Quantity")}
         />,
         <Form.TextField
           key={`rate_${i}`}
           id={`rate_${i}`}
-          title={`Rate (£) ${i + 1}`}
+          title={`Rate (${getCurrencySymbol()}) ${i + 1}`}
           placeholder="0.00"
           error={errors[`rate_${i}`]}
           onChange={(v) => {
             clearError(`rate_${i}`);
             updateLineItemValue(`rate_${i}`, v);
           }}
-          onBlur={(e) =>
-            validateNumber(`rate_${i}`, e.target.value as string, "Rate", false)
-          }
+          onBlur={(e) => validateNumber(`rate_${i}`, e.target.value as string, "Rate", false)}
         />,
       ]).flat()}
 
