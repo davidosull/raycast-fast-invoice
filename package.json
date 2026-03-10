@@ -183,6 +183,7 @@
   },
   "scripts": {
     "build": "ray build",
+    "publish": "ray publish",
     "dev": "ray develop",
     "fix-lint": "ray lint --fix",
     "lint": "ray lint",

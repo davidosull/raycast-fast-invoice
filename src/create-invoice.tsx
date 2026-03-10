@@ -42,14 +42,24 @@ export default function CreateInvoice() {
   );
   const [vatChecked, setVatChecked] = useState(preferences.vatRegistered);
 
+  const paymentDays = parseInt(preferences.paymentTermsDays) || 30;
+
   const initialToday = new Date();
   initialToday.setHours(0, 0, 0, 0);
   const initialDue = new Date(initialToday);
-  initialDue.setDate(
-    initialDue.getDate() + (parseInt(preferences.paymentTermsDays) || 30),
-  );
+  initialDue.setDate(initialDue.getDate() + paymentDays);
   const [invoiceDate, setInvoiceDate] = useState<Date | null>(initialToday);
   const [dueDate, setDueDate] = useState<Date | null>(initialDue);
+
+  function handleInvoiceDateChange(newDate: Date | null) {
+    setInvoiceDate(newDate);
+    if (newDate) {
+      const newDue = new Date(newDate);
+      newDue.setHours(0, 0, 0, 0);
+      newDue.setDate(newDue.getDate() + paymentDays);
+      setDueDate(newDue);
+    }
+  }
   const [errors, setErrors] = useState<Record<string, string | undefined>>({});
 
   function setError(field: string, message: string | undefined) {
@@ -441,7 +451,7 @@ export default function CreateInvoice() {
         title="Invoice Date"
         type={Form.DatePicker.Type.Date}
         value={invoiceDate}
-        onChange={setInvoiceDate}
+        onChange={handleInvoiceDateChange}
         error={errors.invoiceDate}
       />
       <Form.DatePicker
