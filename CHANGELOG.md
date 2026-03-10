@@ -1,6 +1,6 @@
 # Easy Invoice Changelog
 
-## [Initial Version] - 2026-03-04
+## [Initial Version] - {PR_MERGE_DATE}
 
 - Create and generate PDF invoices with automatic numbering
 - Manage clients with saved details

@@ -15,7 +15,7 @@ import { generateCSV } from "./lib/csv-generator";
 import { resolveSaveLocation } from "./lib/formatters";
 import { generatePDFSummary } from "./lib/pdf-summary-generator";
 import { getClients, getInvoices } from "./lib/storage";
-import { Client, Preferences } from "./lib/types";
+import { Client } from "./lib/types";
 
 function getTaxYearStart(): Date {
   const now = new Date();

@@ -160,6 +160,14 @@
       "default": "1"
     },
     {
+      "name": "currencyCode",
+      "title": "Currency",
+      "description": "ISO 4217 currency code for invoice amounts (e.g., GBP, EUR, USD)",
+      "type": "textfield",
+      "required": true,
+      "default": "GBP"
+    },
+    {
       "name": "saveLocation",
       "title": "Invoice Save Location",
       "description": "Base directory for invoice files. Year subfolders are created automatically.",
@@ -174,10 +182,10 @@
     "uuid": "^10.0.0"
   },
   "devDependencies": {
-    "@raycast/eslint-config": "^1.0.11",
+    "@raycast/eslint-config": "^2.0.4",
     "@types/pdfkit": "^0.13.0",
     "@types/uuid": "^10.0.0",
-    "eslint": "^8.57.0",
+    "eslint": "^9.35.0",
     "prettier": "^3.3.0",
     "typescript": "^5.5.0"
   },

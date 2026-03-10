@@ -4,7 +4,7 @@ import PDFDocument from "pdfkit";
 import { PDF } from "./constants";
 import { formatCurrency, formatDate, resolveSaveLocation } from "./formatters";
 import { patchPDFKitFonts } from "./pdfkit-fix";
-import { Invoice, Preferences } from "./types";
+import { Invoice } from "./types";
 
 patchPDFKitFonts();
 

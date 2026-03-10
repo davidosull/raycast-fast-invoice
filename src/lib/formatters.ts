@@ -1,16 +1,18 @@
+import { getPreferenceValues } from "@raycast/api";
 import { homedir } from "os";
 import path from "path";
 import { Invoice } from "./types";
 
 export function formatCurrency(amount: number): string {
-  return `£${amount.toLocaleString("en-GB", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
+  const { currencyCode } = getPreferenceValues<{ currencyCode?: string }>();
+  return new Intl.NumberFormat(undefined, {
+    style: "currency",
+    currency: currencyCode || "GBP",
+  }).format(amount);
 }
 
 export function formatDate(isoDate: string): string {
-  return new Date(isoDate).toLocaleDateString("en-GB", {
+  return new Date(isoDate).toLocaleDateString(undefined, {
     day: "numeric",
     month: "long",
     year: "numeric",

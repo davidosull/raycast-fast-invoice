@@ -40,6 +40,8 @@ type ExtensionPreferences = {
   "invoicePrefix": string,
   /** Starting Invoice Number - First invoice number to use. Set to continue an existing sequence (e.g., 24 if last invoice was INV-0023) */
   "startingInvoiceNumber": string,
+  /** Currency - ISO 4217 currency code for invoice amounts (e.g., GBP, EUR, USD) */
+  "currencyCode": string,
   /** Invoice Save Location - Base directory for invoice files. Year subfolders are created automatically. */
   "saveLocation": string
 }

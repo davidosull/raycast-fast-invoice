@@ -26,7 +26,7 @@ import {
   getClients,
   getNextInvoiceNumber,
 } from "./lib/storage";
-import { Client, Invoice, InvoiceLineItem, Preferences } from "./lib/types";
+import { Client, Invoice, InvoiceLineItem } from "./lib/types";
 
 const NEW_CLIENT_ID = "__new__";
 

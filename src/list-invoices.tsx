@@ -32,7 +32,7 @@ import {
   getNextInvoiceNumber,
   updateInvoiceStatus,
 } from "./lib/storage";
-import { Invoice, InvoiceStatus, Preferences } from "./lib/types";
+import { Invoice, InvoiceStatus } from "./lib/types";
 
 export default function ListInvoices() {
   const preferences = getPreferenceValues<Preferences>();

@@ -1,5 +1,4 @@
-import { LocalStorage } from "@raycast/api";
-import fs from "fs";
+import { LocalStorage, trash } from "@raycast/api";
 import { STORAGE_KEYS } from "./constants";
 import { Client, Invoice, InvoiceCounter, InvoiceStatus } from "./types";
 
@@ -66,11 +65,8 @@ export async function deleteInvoice(id: string): Promise<void> {
   const invoices = await getInvoices();
   const invoice = invoices.find((inv) => inv.id === id);
   if (invoice) {
-    // Delete PDF file if it exists
     try {
-      if (fs.existsSync(invoice.pdfPath)) {
-        fs.unlinkSync(invoice.pdfPath);
-      }
+      await trash(invoice.pdfPath);
     } catch {
       // PDF deletion is best-effort
     }

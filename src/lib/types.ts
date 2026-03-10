@@ -44,23 +44,3 @@ export interface Invoice {
 export interface InvoiceCounter {
   currentNumber: number;
 }
-
-export interface Preferences {
-  businessName: string;
-  yourName: string;
-  businessAddress: string;
-  businessEmail: string;
-  businessPhone: string;
-  bankName: string;
-  accountName: string;
-  sortCode: string;
-  accountNumber: string;
-  paymentTermsDays: string;
-  paymentTermsText?: string;
-  vatRegistered: boolean;
-  vatRate: string;
-  vatNumber?: string;
-  invoicePrefix: string;
-  startingInvoiceNumber: string;
-  saveLocation: string;
-}

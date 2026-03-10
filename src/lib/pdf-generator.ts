@@ -9,7 +9,7 @@ import {
   resolveSaveLocation,
 } from "./formatters";
 import { patchPDFKitFonts } from "./pdfkit-fix";
-import { Invoice, Preferences } from "./types";
+import { Invoice } from "./types";
 
 // Ensure font files are available before any PDF generation
 patchPDFKitFonts();
